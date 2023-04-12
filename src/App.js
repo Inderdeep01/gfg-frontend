@@ -1,24 +1,21 @@
-import logo from './logo.svg';
-import './App.css';
-
+import {Navigate, Route, BrowserRouter as Router, Routes} from 'react-router-dom'
+import Auth from './pages/Auth';
+import SplashScreen from './pages/SplashScreen';
+import { useState } from 'react'
+import { useSelector } from 'react-redux';
+import Home from './pages/Home';
 function App() {
+  const [activeIndex,setActiveIndex]=useState(0);
+  const [front,setFront]=useState(true);
+  const {userInfo}=useSelector(state=>state.userLogin);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path='/' element={front?<SplashScreen setFront={setFront}/>:<Home/>}/>
+        <Route path='/auth' element={front?<SplashScreen setFront={setFront}/>:<Navigate to='/auth/login'/>}/>
+        <Route path='/auth/:method' element={front?<SplashScreen setFront={setFront}/>:(userInfo?<Navigate to='/'/>:<Auth activeIndex={activeIndex} setActiveIndex={setActiveIndex}/>)}/>
+      </Routes>
+    </Router>
   );
 }
 
