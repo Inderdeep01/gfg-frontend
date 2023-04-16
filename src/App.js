@@ -11,9 +11,11 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path='/' element={front?<SplashScreen setFront={setFront}/>:<Home/>}/>
         <Route path='/auth' element={front?<SplashScreen setFront={setFront}/>:<Navigate to='/auth/login'/>}/>
         <Route path='/auth/:method' element={front?<SplashScreen setFront={setFront}/>:(userInfo?<Navigate to='/'/>:<Auth activeIndex={activeIndex} setActiveIndex={setActiveIndex}/>)}/>
+        <Route path='/'  element={front?<SplashScreen setFront={setFront}/>:<Home/>}/>
+        {/* <Route path='/' element={<SplashScreen setFront={setFront}/>}/> */}
+        <Route path='/:page'  element={front?<SplashScreen setFront={setFront}/>:<Home/>}/>
       </Routes>
     </Router>
   );

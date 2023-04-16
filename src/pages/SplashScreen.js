@@ -16,7 +16,7 @@ const useStyles=makeStyles((theme)=>({
   },
   loadBox:{
     width:'500px',
-    height:'300px',
+    height:'fit-content',
     [theme.breakpoints.down("xs")]:{
       width:'100%',
     },
@@ -27,8 +27,8 @@ const useStyles=makeStyles((theme)=>({
     flexDirection:'column',
   },
   logo:{
-    width:'70%',
-    marginBottom:'30px'
+    width:'100%',
+    // marginBottom:'30px'
   }
 }))
 const SplashScreen = ({setFront}) => {
@@ -81,6 +81,23 @@ const SplashScreen = ({setFront}) => {
   return (
     <Box className={classes.outer}>
       <Box className={classes.loadBox}>
+        {/* <Box sx={{
+          display:'flex',
+          width:'100%',
+          marginBottom:'30px',
+        }}>
+          <img src="/img/ipbs.png" className={classes.logo}/>
+          <Box sx={{
+            width:'50%',
+            display:'flex',
+            justifyContent:'center',
+            alignItems:'center',
+            flexDirection:'column',
+          }}>
+            <h1 style={{fontSize:'80px',fontFamily:'sans-serif',margin:'0px',fontWeight:'800',color:'#cecfd1',WebkitTextStroke:'2px #464649'}}>IPBS</h1>
+            <span style={{marginBottom:'30px',fontSize:'20px',fontWeight:'500'}}>Always Available</span>
+          </Box>
+        </Box> */}
         <img src="/img/logo.png" className={classes.logo}/>
         <LinearProgress sx={{
           width:'80%',

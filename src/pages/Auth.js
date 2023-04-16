@@ -15,6 +15,7 @@ const useStyle=makeStyles((theme)=>({
         justifyContent:'center',
         alignItems:'center',
         background:'url(https://media.istockphoto.com/id/165489882/vector/air-flow.jpg?s=612x612&w=0&k=20&c=63djVUrVTyBCpFRN1r5STD9lddHjrP2XXDqTCHzYy-E=)',
+        // background:'url(https://cdn2.f-cdn.com/contestentries/2046262/59234771/61ee720c6a10a_thumb900.jpg)',
         backgroundSize:'cover'
     },
     authBox:{
@@ -50,7 +51,7 @@ const useStyle=makeStyles((theme)=>({
       overflow:'hidden',
       borderTopRightRadius:'20px',
       borderBottomRightRadius:'20px',
-      border:'1px solid white',
+      borderLeft:'1px solid white',
       // background: 'rgb(55,76,103)',
       background: 'linear-gradient(180deg, rgba(55,76,103,1) 0%, rgba(35,48,65,1) 100%)',
       [theme.breakpoints.down("sm")]:{
@@ -159,9 +160,9 @@ const Auth = ({activeIndex,setActiveIndex}) => {
           </Box>
           <Box className={classes.heading}>
             <Box className={classes.inheading}>
-              <Box className={`${method==='login' && classes.activehead}`}>Login</Box>
+              <Box className={`${method==='login' && classes.activehead}`} sx={{cursor:'pointer'}} onClick={()=>{navigate('/auth/login')}}>Login</Box>
               <Box>or</Box>
-              <Box className={`${method==='signup' && classes.activehead}`}>Sign Up</Box>
+              <Box className={`${method==='signup' && classes.activehead}`} sx={{cursor:'pointer'}} onClick={()=>{navigate('/auth/signup')}}>Sign Up</Box>
             </Box>
             <Box
             style={{
