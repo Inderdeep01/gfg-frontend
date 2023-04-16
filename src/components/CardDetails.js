@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DoneIcon from '@mui/icons-material/Done';
+import PayUsingCard from "./PayUsingCard";
 
 const useStyle=makeStyles((theme)=>({
     modal: {
@@ -155,6 +156,27 @@ const useStyle=makeStyles((theme)=>({
         cursor:'pointer',
         position:'absolute',
         bottom:'20px',
+    },
+    pay:{
+        marginTop:'30px',
+        display:'flex',
+        width:'fit-content',
+        height:'40px',
+        fontSize:'18px',
+        alignItems:'center',
+        fontWeight:'500',
+        paddingLeft:'10px',
+        paddingRight:'10px',
+        justifyContent:'center',
+        borderRadius:'20px',
+        color:'#1979e6',
+        border:'1px solid #1979e6',
+        background:'transparent',
+        cursor:'pointer',
+        '&:hover':{
+            color:'white',
+            background:'#1979e6'
+        }
     }
 }))
 const CardDetails = ({setTransact,cardId}) => {
@@ -181,6 +203,7 @@ const CardDetails = ({setTransact,cardId}) => {
       const {cards}=useSelector(state=>state.cardsList);
       const [card,setCard]=useState({});
       const [index,setIndex]=useState(0);
+      const [open,setOpen]=useState(false);
       useEffect(()=>{
         const c=cards?.filter((cr,i)=>{
         if(cr._id===cardId){
@@ -190,7 +213,7 @@ const CardDetails = ({setTransact,cardId}) => {
         return false;
         })[0];
         setCard(c);
-      },[cardId]);
+      },[cardId,cards]);
     //   console.log(cardId);
     // const [show,setShow]=useState(false);
   return (
@@ -199,9 +222,10 @@ const CardDetails = ({setTransact,cardId}) => {
         height:'100%',
         display:'flex',
         justifyContent:'center',
-        alignItems:'center'
+        alignItems:'center',
+        flexDirection:'column'
     }}>
-        <Box className={classes.btn} onClick={()=>setTransact(true)}>View Transactions</Box>
+    <Box className={classes.btn} onClick={()=>setTransact(true)}>View Transactions</Box>
     <Box className={classes.card}
     sx={{
         background:grad[index],
@@ -220,7 +244,7 @@ const CardDetails = ({setTransact,cardId}) => {
         </Box>
         <Box sx={{
             marginTop:'30px'
-        }}>{card?.cardNumber.substr(0,4)}&nbsp;&nbsp;&nbsp;{card?.cardNumber.substr(4,4)}&nbsp;&nbsp;&nbsp;{card?.cardNumber.substr(8,4)}&nbsp;&nbsp;&nbsp;{card?.cardNumber.substr(12,4)}&nbsp;&nbsp;&nbsp;<ContentCopyIcon fontSize="10" sx={{cursor:'pointer'}} onClick={()=>{navigator.clipboard.writeText(card?.cardNumber)}}/></Box>
+        }}>{card?.cardNumber?.substr(0,4)}&nbsp;&nbsp;&nbsp;{card?.cardNumber?.substr(4,4)}&nbsp;&nbsp;&nbsp;{card?.cardNumber?.substr(8,4)}&nbsp;&nbsp;&nbsp;{card?.cardNumber?.substr(12,4)}&nbsp;&nbsp;&nbsp;<ContentCopyIcon fontSize="10" sx={{cursor:'pointer'}} onClick={()=>{navigator.clipboard.writeText(card?.cardNumber)}}/></Box>
         <Box sx={{
             marginTop:'30px',
             display:'flex',
@@ -232,6 +256,8 @@ const CardDetails = ({setTransact,cardId}) => {
         {/* <Box className={classes.showBtn}>{show?'Show Details':'Hide Details'}</Box> */}
       </ThemeProvider>
     </Box>
+    <Box className={classes.pay} onClick={()=>setOpen(true)}>Pay Using card</Box>
+    <PayUsingCard open={open} setOpen={setOpen} cardNumber={card?.cardNumber}/>
     </Box>
   );
 };

@@ -1,6 +1,6 @@
 import { makeStyles } from '@material-ui/core'
 import { Box } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -8,6 +8,8 @@ import DownloadingIcon from '@mui/icons-material/Downloading';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import DoneIcon from '@mui/icons-material/Done';
 import Deposit from './Deposit';
+import axios from 'axios';
+import { URL } from '../ServerURL';
 const useStyle=makeStyles((theme)=>({
     outer:{
         width:'100%',
@@ -126,6 +128,28 @@ const Balance = ({setTransact}) => {
             setCopy(false)
         },5000)
     }
+    const [balances,setBalances]=useState([]);
+    const fetchBalance=async()=>{
+        try
+            {
+                const config={
+                    headers:{
+                        "Content-Type":'application/json',
+                        'Authorization':`Bearer ${userInfo.token}`
+                    }
+                }
+                const {data}=await axios.get(`${URL}/balance`,config);
+                setBalances(data);
+            }
+            catch(err)
+            {
+                var e=err.response && err.response.data.message? err.response.data.message:err.message;
+                console.log(e);
+            }
+    }
+    useEffect(()=>{
+        fetchBalance();
+    },[])
     const [open,setOpen]=useState(false);
   return (
     <Box className={classes.outer}>
@@ -151,19 +175,27 @@ const Balance = ({setTransact}) => {
                     </Box>
                 </Box>
             </Box>
-            <Box>
-                <Box className={classes.balance} sx={{
-                    color:'rgb(25, 121, 230)',
-                }}>
-                    <Box className={classes.rupees}><CurrencyRupeeIcon/></Box>
-                    <Box sx={{marginTop:'10px',fontSize:'20px',color:'black'}}>INR</Box>
-                    <Box sx={{
-                        // color:'rgb(25, 121, 230)',
-                    }}><CurrencyRupeeIcon/> <span style={{
-                        fontSize:'30px',
-                        fontWeight:'bold'
-                    }}>100000</span></Box>
-                </Box>
+            <Box sx={{
+                display:'flex',
+                gap:'30px'
+            }}>
+                {balances?.map((curr)=>{
+                    return (
+                        <Box className={classes.balance} sx={{
+                            color:'rgb(25, 121, 230)',
+                        }}>
+                            <Box className={`${curr?.currency==='INR'?classes.rupees:classes.usd}`}>{curr?.currency==='INR'?<CurrencyRupeeIcon/>:<CurrencyExchangeIcon/>}</Box>
+                            <Box sx={{marginTop:'10px',fontSize:'20px',color:'black'}}>{curr?.currency}</Box>
+                            <Box sx={{
+                                // color:'rgb(25, 121, 230)',
+                            }}>{curr?.currency==='INR'?<CurrencyRupeeIcon/>:<CurrencyExchangeIcon/>}
+                             <span style={{
+                                fontSize:'30px',
+                                fontWeight:'bold'
+                            }}>{curr?.balance}</span></Box>
+                        </Box>
+                    )
+                })}
             </Box>
         </Box>
         <Deposit open={open} setOpen={setOpen}/>

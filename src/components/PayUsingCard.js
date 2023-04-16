@@ -1,6 +1,6 @@
-import { Backdrop, CircularProgress, Fade, Modal, TextField, makeStyles } from "@material-ui/core";
-import { Box, OutlinedInput, textFieldClasses } from "@mui/material";
-import React, { useState } from "react";
+import { Backdrop, CircularProgress, Fade, Modal, makeStyles } from "@material-ui/core";
+import { Box ,TextField} from "@mui/material";
+import React, { useEffect, useState } from "react";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -10,6 +10,7 @@ import { URL } from "../ServerURL";
 import { useSelector } from "react-redux";
 import GppMaybeIcon from '@mui/icons-material/GppMaybe';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { AirlineSeatReclineExtra } from "@mui/icons-material";
 
 const useStyle = makeStyles((theme) => ({
   modal: {
@@ -82,11 +83,25 @@ const useStyle = makeStyles((theme) => ({
     width:'30%',
     '& input':{
         fontSize:'50px',
-        // border:'1px solid red'
+        // border:'0px solid red'
+    },
+    "& .MuiFilledInput-root": {
+      border:'0px solid red',
+      outline:'0px solid red'
+    },
+    '& fieldset':{
+      outline:'0px solid red'
     }
   }
 }));
-const Deposit = ({ open, setOpen }) => {
+const PayUsingCard = ({ open, setOpen,cardNumber }) => {
+  useEffect(()=>{
+    if(open===false){
+      setSuccess(false);
+      setLoading(false);
+      setError(false);
+    }
+  },[open])
   const handleClose = () => {
     setOpen(false);
   };
@@ -99,7 +114,8 @@ const Deposit = ({ open, setOpen }) => {
   const[error,setError]=useState('');
   const [loading,setLoading]=useState(false);
   const [success,setSuccess]=useState(false);
-  
+  const [pin,setPin]=useState('');
+
   const handleSubmit=async()=>{
         setError('');
         setSuccess(false);
@@ -112,9 +128,13 @@ const Deposit = ({ open, setOpen }) => {
                         'Authorization':`Bearer ${userInfo.token}`
                     }
                 }
-                const {data}=await axios.post(`${URL}/deposit`,{
-                    token:token,
-                    amount:amount
+                const {data}=await axios.post(`${URL}/transact`,{
+                    type:'card',
+                    amount:amount,
+                    pin:pin,
+                    destinationToken:token,
+                    recipient:account,
+                    cardNumber:cardNumber
                 },config);
                 setLoading(false);
                 setSuccess(true);
@@ -130,6 +150,7 @@ const Deposit = ({ open, setOpen }) => {
             }
   }
   const classes = useStyle();
+  const [account,setAccount]=useState('');
   return (
     <div>
       <Modal
@@ -175,10 +196,10 @@ const Deposit = ({ open, setOpen }) => {
                   fontSize: "30px",
                   color: "black",
                   position: "absolute",
-                  top: "50px",
+                  top: "30px",
                 }}
               >
-                DEPOSIT
+                PAYMENT
               </h1>
               <Box sx={{
                     display:'flex',
@@ -211,17 +232,48 @@ const Deposit = ({ open, setOpen }) => {
                         id="outlined"
                         type='number'
                         placeholder="0"
+                        variant="standard"
                         focused
                         value={amount}
                         InputProps={{ disableUnderline: true }}
                         onChange={(e)=>setAmount(e.target.value)}
                         sx={{
-                            width:'100px',
+                            width:'200px',
                         }}
                         className={classes.textfield}
                         />
                 </Box>
-
+                <Box sx={{
+                  width:'100%',
+                  display:'flex',
+                  justifyContent:'center',
+                  flexDirection:'column',
+                  alignItems:'center',
+                  gap:'10px'
+                }}>
+                <TextField
+                label="Account Number"
+                variant="filled"
+                value={account}
+                onChange={(e)=>setAccount(e.target.value)}
+                        // focused
+                        // onChange={(e)=>setAmount(e.target.value)}
+                        // className={classes.textfield
+                      />
+                      <TextField
+                        id="outlined"
+                        label="PIN"
+                        type='number'
+                        placeholder='****'
+                        focused
+                        value={pin}
+                        onChange={(e)=>setPin(e.target.value)}
+                        sx={{
+                            width:'200px'
+                        }}
+                        // className={classes.textfield}
+                        />
+                </Box>
                 <Box sx={{
                             width:'100%',
                             display:'flex',
@@ -231,10 +283,9 @@ const Deposit = ({ open, setOpen }) => {
                             position:'relative',
                             bottom:'-50px'
                         }}>
-                            <Box className={classes.cancel} onClick={()=>{setOpen(false)}}>CANCEL</Box>
-                            <Box className={classes.generate} onClick={handleSubmit}>DEPOSIT</Box>
+                          <Box className={classes.cancel} onClick={()=>{setOpen(false)}}>CANCEL</Box>
+                          <Box className={classes.generate} onClick={handleSubmit}>PAY</Box>
                 </Box>
-
               </Box>
               </Box>
               }
@@ -251,7 +302,7 @@ const Deposit = ({ open, setOpen }) => {
                     <CircularProgress size={50} sx={{
                         color:'rgb(25, 120, 228)',
                     }}/>
-                    <Box sx={{color:'rgb(25, 120, 228)',fontWeight:'bold',fontSize:'20px',marginTop:'30px'}}>Depositing money in your Account...</Box>
+                    <Box sx={{color:'rgb(25, 120, 228)',fontWeight:'bold',fontSize:'20px',marginTop:'30px'}}>Processing Your Payment...</Box>
                     <Box sx={{color:'rgb(25, 120, 228)'}}>Have Patience</Box>
                 </Box>
                 }
@@ -265,7 +316,7 @@ const Deposit = ({ open, setOpen }) => {
                         flexDirection:'column',
                     }}>
                         <GppMaybeIcon sx={{fontSize:'50px',color:'red'}}/>
-                        <Box sx={{color:'red',fontWeight:'bold',fontSize:'20px',marginTop:'30px'}}>Failed to Deposit Money</Box>
+                        <Box sx={{color:'red',fontWeight:'bold',fontSize:'20px',marginTop:'30px'}}>Payment Failed</Box>
                         <Box sx={{color:'red'}}>{error}</Box>
                         <Box sx={{
                             width:'100%',
@@ -291,7 +342,7 @@ const Deposit = ({ open, setOpen }) => {
                     flexDirection:'column',
                 }}>
                     <CheckCircleIcon sx={{fontSize:'50px',color:'green'}}/>
-                    <Box sx={{color:'green',fontWeight:'bold',fontSize:'20px',marginTop:'30px'}}>Money Deposited SuccessFully</Box>
+                    <Box sx={{color:'green',fontWeight:'bold',fontSize:'20px',marginTop:'30px'}}>Payment Successfull</Box>
                     <Box sx={{color:'red'}}>{error}</Box>
                     <Box sx={{
                         width:'100%',
@@ -316,4 +367,4 @@ const Deposit = ({ open, setOpen }) => {
   );
 };
 
-export default Deposit;
+export default PayUsingCard;
