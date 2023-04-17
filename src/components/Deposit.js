@@ -1,15 +1,16 @@
 import { Backdrop, CircularProgress, Fade, Modal, TextField, makeStyles } from "@material-ui/core";
 import { Box, OutlinedInput, textFieldClasses } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import axios from "axios";
 import { URL } from "../ServerURL";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import GppMaybeIcon from '@mui/icons-material/GppMaybe';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { GET_ACCOUNT_BALANCE_SUCCESS } from "../store/Constants/AccountBalanceConstant";
 
 const useStyle = makeStyles((theme) => ({
   modal: {
@@ -87,6 +88,14 @@ const useStyle = makeStyles((theme) => ({
   }
 }));
 const Deposit = ({ open, setOpen }) => {
+  useEffect(()=>{
+    if(open==false){
+      setAmount('');
+      setError(false);
+      setLoading(false);
+      setSuccess(false);
+    }
+  },[open])
   const handleClose = () => {
     setOpen(false);
   };
@@ -100,6 +109,9 @@ const Deposit = ({ open, setOpen }) => {
   const [loading,setLoading]=useState(false);
   const [success,setSuccess]=useState(false);
   
+  const dispatch=useDispatch();
+  const {balances}=useSelector(state=>state.accountBalance);
+
   const handleSubmit=async()=>{
         setError('');
         setSuccess(false);
@@ -116,10 +128,23 @@ const Deposit = ({ open, setOpen }) => {
                     token:token,
                     amount:amount
                 },config);
+                const current=balances?.filter((curr)=>curr.currency===token)[0];
+                const left=balances?.filter((curr)=>curr.currency!==token);
+                const payload=[
+                  {
+                    currency:token,
+                    balance:current.balance+JSON.parse(amount),
+                  },
+                  ...left,
+                ]
+                dispatch({
+                  type:GET_ACCOUNT_BALANCE_SUCCESS,
+                  payload:payload
+                })
                 setLoading(false);
                 setSuccess(true);
                 setTimeout(()=>{
-                    setSuccess(false);
+                  setOpen(false);
                 },5000)
             }
             catch(err)
@@ -213,7 +238,7 @@ const Deposit = ({ open, setOpen }) => {
                         placeholder="0"
                         focused
                         value={amount}
-                        InputProps={{ disableUnderline: true }}
+                        InputProps={{ disableUnderline: true,inputProps: { min: 0}}}
                         onChange={(e)=>setAmount(e.target.value)}
                         sx={{
                             width:'100px',

@@ -1,5 +1,5 @@
-import { makeStyles } from '@material-ui/core';
-import { Box } from '@mui/material'
+import { CircularProgress, makeStyles } from '@material-ui/core';
+import { Box, Skeleton } from '@mui/material'
 import Card from './Card';
 import { useLocation, useNavigate } from 'react-router-dom'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -116,6 +116,20 @@ const useStyle=makeStyles((theme)=>({
             width:'88%',
             height:'33px'
         }
+    },
+    loadCard:{
+        display:'flex',
+        justifyContent:'center',
+        alignItems:'center',
+        cursor:'pointer',
+        width:'98%',
+        height:'70px',
+        borderRadius:'15px',
+        display:'flex',
+        justifyContent:'center',
+        flexDirection:'column',
+        alignItems:'center',
+        position:'relative',
     }
 }))
 const Sidebar = ({side,setSide}) => {
@@ -159,10 +173,13 @@ const Sidebar = ({side,setSide}) => {
                 <Box className={`${classes.cardlist}`} sx={{
                     height:showCards?`${(cards?.length+1)*85}px`:'0px',
                 }}>
+                    {loading && 
+                    <Skeleton variant='rectangular' height='70px' width='98%' className={classes.loadCard}></Skeleton>
+                    }
                     {cards?.map((card,index)=>{
-                        return <Card id={card?._id} key={`${index}`} cardName={card?.purpose} cardNumber={card?.cardNumber} cardCompany={card?.network} gradient={index}  setSide={setSide}/>
+                        return <Card id={card?._id} key={`${index}`} cardName={card?.purpose} cardNumber={card?.cardNumber} cardCompany={card?.network} setSide={setSide}/>
                     })}
-                    {cards?.length<5 && <AddCard/>}
+                    {!loading && cards?.length<5 && <AddCard/>}
                 </Box>
             </Box>
         </Box>

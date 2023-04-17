@@ -43,7 +43,7 @@ const useStyle=makeStyles((theme)=>({
       borderBottomLeftRadius:'20px',
       [theme.breakpoints.down("sm")]:{
         display:'none',
-      }
+      },
     },
     auth:{
       width:'50%',
@@ -62,6 +62,7 @@ const useStyle=makeStyles((theme)=>({
         borderRadius:'0px',
         border:'0px solid white'
       },
+
     },
     upperdiv:{
       width:'100%',

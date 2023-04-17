@@ -1,16 +1,16 @@
 import { Backdrop, CircularProgress, Fade, Modal, makeStyles } from "@material-ui/core";
-import { Box ,TextField} from "@mui/material";
+import { Box ,FilledInput,IconButton,InputAdornment,InputLabel,TextField} from "@mui/material";
 import React, { useEffect, useState } from "react";
-import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import axios from "axios";
 import { URL } from "../ServerURL";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import GppMaybeIcon from '@mui/icons-material/GppMaybe';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { AirlineSeatReclineExtra } from "@mui/icons-material";
+import { GET_ACCOUNT_BALANCE_SUCCESS } from "../store/Constants/AccountBalanceConstant";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const useStyle = makeStyles((theme) => ({
   modal: {
@@ -116,6 +116,8 @@ const PayUsingCard = ({ open, setOpen,cardNumber }) => {
   const [success,setSuccess]=useState(false);
   const [pin,setPin]=useState('');
 
+  const {balances}=useSelector(state=>state.accountBalance);
+  const dispatch=useDispatch();
   const handleSubmit=async()=>{
         setError('');
         setSuccess(false);
@@ -136,11 +138,24 @@ const PayUsingCard = ({ open, setOpen,cardNumber }) => {
                     recipient:account,
                     cardNumber:cardNumber
                 },config);
+                const current=balances?.filter((curr)=>curr.currency===token)[0];
+                const left=balances?.filter((curr)=>curr.currency!==token);
+                const payload=[
+                  {
+                    currency:token,
+                    balance:current.balance-JSON.parse(amount),
+                  },
+                  ...left,
+                ]
+                dispatch({
+                  type:GET_ACCOUNT_BALANCE_SUCCESS,
+                  payload:payload
+                })
                 setLoading(false);
                 setSuccess(true);
                 setTimeout(()=>{
-                    setSuccess(false);
-                },5000)
+                    setOpen(false);
+                },6000)
             }
             catch(err)
             {
@@ -151,6 +166,13 @@ const PayUsingCard = ({ open, setOpen,cardNumber }) => {
   }
   const classes = useStyle();
   const [account,setAccount]=useState('');
+
+  const [showPassword, setShowPassword] = React.useState(false);
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (e) => {
+    e.preventDefault();
+  };
   return (
     <div>
       <Modal
@@ -235,7 +257,7 @@ const PayUsingCard = ({ open, setOpen,cardNumber }) => {
                         variant="standard"
                         focused
                         value={amount}
-                        InputProps={{ disableUnderline: true }}
+                        InputProps={{ disableUnderline: true,inputProps: { min: 0}}}
                         onChange={(e)=>setAmount(e.target.value)}
                         sx={{
                             width:'200px',
@@ -256,23 +278,36 @@ const PayUsingCard = ({ open, setOpen,cardNumber }) => {
                 variant="filled"
                 value={account}
                 onChange={(e)=>setAccount(e.target.value)}
+                sx={{
+                  width:'240px',
+                  marginTop:'10px',
+                  marginBottom:'10px'
+                }}
                         // focused
                         // onChange={(e)=>setAmount(e.target.value)}
                         // className={classes.textfield
                       />
-                      <TextField
-                        id="outlined"
-                        label="PIN"
-                        type='number'
-                        placeholder='****'
-                        focused
-                        value={pin}
-                        onChange={(e)=>setPin(e.target.value)}
-                        sx={{
-                            width:'200px'
-                        }}
-                        // className={classes.textfield}
+                            <FormControl variant="filled" className={classes.input}>
+                            <InputLabel htmlFor="filled-adornment-password" color='success'>PIN</InputLabel>
+                            <FilledInput
+                            id="filled-adornment-password"
+                            value={pin}
+                            onChange={(e)=>{setPin(e.target.value)}}
+                            type={showPassword ? 'text' : 'password'}
+                            endAdornment={
+                            <InputAdornment position="end">
+                                <IconButton
+                                aria-label="toggle password visibility"
+                                onClick={handleClickShowPassword}
+                                onMouseDown={handleMouseDownPassword}
+                                edge="end"
+                                >
+                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                </IconButton>
+                            </InputAdornment>
+                            }
                         />
+                        </FormControl>
                 </Box>
                 <Box sx={{
                             width:'100%',
@@ -328,7 +363,10 @@ const PayUsingCard = ({ open, setOpen,cardNumber }) => {
                             bottom:'-50px'
                         }}>
                             <Box className={classes.cancel} onClick={()=>{setOpen(false)}}>CANCEL</Box>
-                            <Box className={classes.generate} onClick={handleSubmit}>RETRY</Box>
+                            <Box className={classes.generate} onClick={()=>{
+                              setError('');
+                              setLoading('');
+                            }}>RETRY</Box>
                         </Box>
                     </Box>
                 }

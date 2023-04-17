@@ -1,7 +1,7 @@
-import { makeStyles } from '@material-ui/core'
-import { Box } from '@mui/material'
+import { CircularProgress, makeStyles } from '@material-ui/core'
+import { Box, Skeleton } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DownloadingIcon from '@mui/icons-material/Downloading';
@@ -10,6 +10,7 @@ import DoneIcon from '@mui/icons-material/Done';
 import Deposit from './Deposit';
 import axios from 'axios';
 import { URL } from '../ServerURL';
+import { getbalance } from '../store/Actions/AccountBalanceActions';
 const useStyle=makeStyles((theme)=>({
     outer:{
         width:'100%',
@@ -66,7 +67,7 @@ const useStyle=makeStyles((theme)=>({
         transition:`all 0.2s ${theme.transitions.easing.easeInOut}`,
         '&:hover':{
             transform:'translateY(-10px)',
-        }
+        },
     },
     rupees:{
         background:'rgb(25, 121, 230,0.2)',
@@ -115,6 +116,10 @@ const useStyle=makeStyles((theme)=>({
         paddingRight:'20px',
         borderRadius:'10px',
         position:'relative',
+    },
+    laoding:{
+        cursor:'pointer',
+        borderRadius:'20px',
     }
 }))
 const Balance = ({setTransact}) => {
@@ -128,28 +133,16 @@ const Balance = ({setTransact}) => {
             setCopy(false)
         },5000)
     }
-    const [balances,setBalances]=useState([]);
-    const fetchBalance=async()=>{
-        try
-            {
-                const config={
-                    headers:{
-                        "Content-Type":'application/json',
-                        'Authorization':`Bearer ${userInfo.token}`
-                    }
-                }
-                const {data}=await axios.get(`${URL}/balance`,config);
-                setBalances(data);
-            }
-            catch(err)
-            {
-                var e=err.response && err.response.data.message? err.response.data.message:err.message;
-                console.log(e);
-            }
-    }
+
+    const {balances,loading,error}=useSelector(state=>state.accountBalance);
+    const dispatch=useDispatch();
+
     useEffect(()=>{
-        fetchBalance();
-    },[])
+        if(!balances){
+            dispatch(getbalance());
+        }
+    },[userInfo])
+
     const [open,setOpen]=useState(false);
   return (
     <Box className={classes.outer}>
@@ -179,6 +172,9 @@ const Balance = ({setTransact}) => {
                 display:'flex',
                 gap:'30px'
             }}>
+                
+                {loading && <Skeleton variant='rectangular' width={200} height={200} className={classes.laoding}></Skeleton>}
+
                 {balances?.map((curr)=>{
                     return (
                         <Box className={classes.balance} sx={{

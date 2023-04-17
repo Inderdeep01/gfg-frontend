@@ -2,6 +2,7 @@ import { makeStyles } from '@material-ui/core';
 import { Box } from '@mui/material'
 import React from 'react'
 import { useNavigate } from 'react-router-dom';
+import { NetworkGradient, NetworkImage } from '../utils/gradientAndImages';
 
 const useStyle=makeStyles((theme)=>({
     outer:{
@@ -33,27 +34,13 @@ const useStyle=makeStyles((theme)=>({
         objectFit:'contain'
     },
 }))
-const Card = ({id,cardName,cardNumber,cardCompany,gradient,setSide}) => {
+const Card = ({id,cardName,cardNumber,cardCompany,setSide}) => {
     const classes=useStyle();
-    const grad=[
-        'linear-gradient(103deg, rgba(83,1,248,1) 0%, rgba(255,1,48,1) 100%)',
-        'linear-gradient(103deg, rgba(65,41,90,1) 0%, rgba(47,7,67,1) 100%)',
-        'linear-gradient(103deg, rgba(0,154,157,1) 0%, rgba(1,203,108,1) 100%)',
-        'radial-gradient(circle farthest-side, #fceabb, #f8b500)',
-        
-    ]
-    const obj={
-        'VISA':'/img/VISA.png',
-        'Mastercard':'/img/Mastercard.png',
-        'IPBS':'/img/IPBS.png',
-        'Amex':'/img/Amex.png',
-        'RuPay':'img/RuPay.png'
-    }
     const navigate=useNavigate();
   return (
     <Box className={classes.outer}
     sx={{
-        background:grad[gradient],
+        background:NetworkGradient[cardCompany],
         cursor:`pointer`
     }}
     onClick={()=>{
@@ -66,7 +53,7 @@ const Card = ({id,cardName,cardNumber,cardCompany,gradient,setSide}) => {
             <Box sx={{color:'white',fontWeight:'450',fontSize:'14px'}}>{cardNumber.substr(0,4)}****{cardNumber.substr(cardNumber.length-4,cardNumber.length)}</Box>
         </Box>
         <Box className={classes.right}>
-            <img src={obj[cardCompany]} className={classes.cardLogo}/>
+            <img src={NetworkImage[cardCompany]} className={classes.cardLogo}/>
         </Box>
     </Box>
   )

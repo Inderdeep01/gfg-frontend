@@ -7,6 +7,7 @@ import Fade from '@material-ui/core/Fade';
 import { useSelector } from 'react-redux';
 import joi from 'joi'
 import GeneratingNewCard from './GeneratingNewCard';
+import { NetworkGradient } from '../utils/gradientAndImages';
 
 const useStyle=makeStyles((theme)=>({
     modal: {
@@ -84,7 +85,6 @@ const useStyle=makeStyles((theme)=>({
         marginBottom:'10px',
         borderRadius:'20px',
         position:'relative',
-        background:'linear-gradient(103deg, rgba(65,41,90,1) 0%, rgba(47,7,67,1) 100%)',
         boxShadow: 'rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px',
         [theme.breakpoints.down("xs")]:{
             width:'75%',
@@ -179,7 +179,9 @@ const GenerateCard = ({open,setOpen}) => {
                     fontSize:'30px',
                     color:''
                 }}>GENERATE CARD</h1>
-                <Box className={classes.card}>
+                <Box className={classes.card} sx={{
+                   background:NetworkGradient[value],
+                }}>
                     <ThemeProvider theme={darkTheme}>
                         <TextField
                         id="outlined"
@@ -208,7 +210,7 @@ const GenerateCard = ({open,setOpen}) => {
                             justifyContent:'space-between',
                             marginTop:'30px',
                         }}>
-                            {['IPBS','MasterCard','VISA','RuPay','Amex'].map((network)=>{
+                            {['IPBS','Mastercard','VISA','RuPay','Amex'].map((network)=>{
                                 return (
                                     <img className={value===network?classes.imgSelected:classes.img} src={`/img/${network}.png`} onClick={()=>setValue(network)}/>
                                 )

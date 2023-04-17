@@ -14,11 +14,13 @@ const useStyle=makeStyles((theme)=>({
         alignItems:'center',
         borderTopLeftRadius:'25px',
         borderBottomLeftRadius:'25px',
-        background:'transparent',
+        // background:'transparent',
     },
     image:{
         width:'100%',
-        height:'575px',
+        // height:'575px',
+
+        height:'100%',
         [theme.breakpoints.down("sm")]:{
             height:'540px'
         },
@@ -39,6 +41,14 @@ const useStyle=makeStyles((theme)=>({
         fontSize:'20px',
         // color: "white",
         textShadow: '-2px 13px 14px rgba(0, 0, 0, 1)',
+    },
+    carouselItem:{
+        display:'flex',
+        justifyContent:'center',
+        alignItems:'center',
+        width:'100%',
+        height:'80vh',
+        // border:'1px solid red'
     }
 }))
 
@@ -59,12 +69,12 @@ const Carousel = ({activeIndex,setActiveIndex}) => {
     const items=images.map((img,index)=>{
         return (
             <div className={`item ${classes.carouselItem}`} data-value={`${index+1}`}>
-                <div style={{
-                    background:`url(${img})`,
+                <div className={classes.image} style={{
+                    backgroundImage:`url(${img})`,
                     backgroundSize:'cover',
                     backgroundPosition:'center',
-                    backgroundRepeat:'no-repeat'
-                }} className={classes.image}/>
+                    backgroundRepeat:'no-repeat',
+                }}/>
                 <div className={classes.text}><h1>{text[index]}</h1></div>
             </div>
         )
