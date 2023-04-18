@@ -183,12 +183,12 @@ const Balance = ({setTransact}) => {
                             <Box className={`${curr?.currency==='INR'?classes.rupees:classes.usd}`}>{curr?.currency==='INR'?<CurrencyRupeeIcon/>:<CurrencyExchangeIcon/>}</Box>
                             <Box sx={{marginTop:'10px',fontSize:'20px',color:'black'}}>{curr?.currency}</Box>
                             <Box sx={{
-                                // color:'rgb(25, 121, 230)',
+                                color:curr?.currency==='INR'?'rgb(25, 121, 230)':'red',
                             }}>{curr?.currency==='INR'?<CurrencyRupeeIcon/>:<CurrencyExchangeIcon/>}
                              <span style={{
                                 fontSize:'30px',
                                 fontWeight:'bold'
-                            }}>{curr?.balance}</span></Box>
+                            }}>{Math.floor(curr?.balance)}</span></Box>
                         </Box>
                     )
                 })}

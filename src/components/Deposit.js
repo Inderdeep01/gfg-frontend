@@ -1,5 +1,5 @@
 import { Backdrop, CircularProgress, Fade, Modal, TextField, makeStyles } from "@material-ui/core";
-import { Box, OutlinedInput, textFieldClasses } from "@mui/material";
+import { Box, } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -11,7 +11,8 @@ import { useDispatch, useSelector } from "react-redux";
 import GppMaybeIcon from '@mui/icons-material/GppMaybe';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { GET_ACCOUNT_BALANCE_SUCCESS } from "../store/Constants/AccountBalanceConstant";
-
+import { NetworkImage } from "../utils/gradientAndImages";
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 const useStyle = makeStyles((theme) => ({
   modal: {
     display: "flex",
@@ -53,12 +54,12 @@ const useStyle = makeStyles((theme) => ({
     }
   },
   generate:{
-    width:'115px',
+    width:'80%',
     height:'40px',
     display:'flex',
     alignItems:'center',
     justifyContent:'center',
-    borderRadius:'20px',
+    borderRadius:'10px',
     background:'#1979e6',
     border:'1px solid #1979e6',
     color:'white',
@@ -80,16 +81,39 @@ const useStyle = makeStyles((theme) => ({
     },
   },
   textfield:{
-    width:'30%',
+    // width:'30%',
     '& input':{
         fontSize:'50px',
-        // border:'1px solid red'
-    }
+    },
+    '& input[type=number]': {
+      '-moz-appearance': 'textfield'
+  },
+  '& input[type=number]::-webkit-outer-spin-button': {
+      '-webkit-appearance': 'none',
+      margin: 0
+  },
+  '& input[type=number]::-webkit-inner-spin-button': {
+      '-webkit-appearance': 'none',
+      margin: 0
   }
+  },
+  image:{
+    width:'70px',
+    height:'70px'
+  },
+  back:{
+    width:'fit-content',
+    cursor:'pointer',
+    padding:'5px',
+    position:'absolute',
+    left:'15px',
+    top:'20px',
+    color:'rgb(25, 121, 230)',
+},
 }));
 const Deposit = ({ open, setOpen }) => {
   useEffect(()=>{
-    if(open==false){
+    if(open===false){
       setAmount('');
       setError(false);
       setLoading(false);
@@ -100,7 +124,7 @@ const Deposit = ({ open, setOpen }) => {
     setOpen(false);
   };
   const [token, setToken] = React.useState('INR');
-  const [amount,setAmount]=useState();
+  const [amount,setAmount]=useState('');
   const handleChange = (event) => {
     setToken(event.target.value);
   };
@@ -155,6 +179,23 @@ const Deposit = ({ open, setOpen }) => {
             }
   }
   const classes = useStyle();
+
+  var a = ['','One ','Two ','Three ','Four ', 'Five ','Six ','Seven ','Eight ','Nine ','Ten ','Eleven ','Twelve ','Thirteen ','Fourteen ','Fifteen ','Sixteen ','Seventeen ','Eighteen ','Nineteen '];
+var b = ['', '', 'twenty','Thirty','Forty','Fifty', 'Sixty','Seventy','Eighty','Ninety'];
+
+function inWords (n) {
+    if ((n = n.toString()).length > 9) return 'overflow';
+    n = ('000000000' + n).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+    if (!n) return; var str = '';
+    str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
+    str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
+    str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
+    str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
+    str+=' Only'
+    // str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) + 'only ' : '';
+    return str;
+}
+
   return (
     <div>
       <Modal
@@ -162,7 +203,7 @@ const Deposit = ({ open, setOpen }) => {
         aria-describedby="transition-modal-description"
         className={classes.modal}
         open={open}
-        onClose={handleClose}
+        onClose={!loading && handleClose}
         closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{
@@ -193,18 +234,22 @@ const Deposit = ({ open, setOpen }) => {
                     alignItems:'center',
                     flexDirection:'column',
                     gap:'20px',
-                    position:'relative'
+                    position:'relative',
                 }}>
-              <h1
-                style={{
-                  fontSize: "30px",
-                  color: "black",
-                  position: "absolute",
-                  top: "50px",
-                }}
-              >
-                DEPOSIT
-              </h1>
+                  <Box className={classes.back} onClick={()=>{setOpen(false)}}><ArrowBackIosNewIcon sx={{fontSize:'30px'}}/></Box>
+                  <Box sx={{
+                    // border:'1px solid red',
+                    position:'absolute',
+                    top:'20px',
+                    display:'flex',
+                    justifyContent:'center',
+                    alignItems:'center',
+                    flexDirection:'column'
+                  }}>
+                    <img src={NetworkImage['IPBS']} className={classes.image}/>
+                    <Box sx={{fontSize:'20px',fontWeight:'bold'}}> {userInfo?.firstName} {userInfo?.lastName}</Box>
+                    <Box sx={{fontSize:'15px',fontWeight:'400',fontFamily:'monospace'}}>Inter Planetary Bank  XX {userInfo?.accountNo.substr(userInfo?.accountNo?.length-4,userInfo?.accountNo?.length)}</Box>
+                  </Box>
               <Box sx={{
                     display:'flex',
                     flexDirection:'column',
@@ -214,8 +259,17 @@ const Deposit = ({ open, setOpen }) => {
                     flexDirection:'row',
                     gap:'20px',
                     justifyContent:'center',
-                    alignItems:'center'
+                    alignItems:'center',
+                    flexDirection:'column'
                 }}>
+                  <Box>You are Adding Money</Box>
+                  <Box sx={{
+                    width:'100%',
+                    display:'flex',
+                    justifyContent:'center',
+                    // border:'1px solid red',
+                    transform:'translate(-30px)'
+                  }}>
                   <FormControl sx={{
                     width:'80px'
                   }}>
@@ -225,7 +279,8 @@ const Deposit = ({ open, setOpen }) => {
                       onChange={handleChange}
                       className={classes.select}
                       style={{
-                        fontSize:'30px'
+                        fontSize:'35px',
+                        transform:'translateY(-10px)'
                       }}
                     >
                       <MenuItem value={'INR'} sx={{textAlign:'center',fontSize:'30px'}}>₹</MenuItem>
@@ -238,28 +293,27 @@ const Deposit = ({ open, setOpen }) => {
                         placeholder="0"
                         focused
                         value={amount}
-                        InputProps={{ disableUnderline: true,inputProps: { min: 0}}}
-                        onChange={(e)=>setAmount(e.target.value)}
-                        sx={{
-                            width:'100px',
-                        }}
+                        onFocus={(e) => e.target.addEventListener("wheel", function (e) { e.preventDefault() }, { passive: false })}
+                        onChange={(e)=>{setAmount(e.target.value)}}
+                        InputProps={{style: {width: `${amount?.length===0?'30':amount?.length*30}px`},disableUnderline: true }}
                         className={classes.textfield}
                         />
                 </Box>
+                <Box sx={{transform:'translateY(-20px)',color:'grey',visibility:amount?'visible':'hidden'}}>{token==='INR'?'Rupees':'USD'} {inWords(amount)}</Box>
+                </Box>
 
-                <Box sx={{
+              </Box>
+              <Box sx={{
                             width:'100%',
                             display:'flex',
                             justifyContent:'center',
                             alignItems:'center',
                             gap:'50px',
-                            position:'relative',
-                            bottom:'-50px'
+                            position:'absolute',
+                            bottom:'10px',
                         }}>
-                            <Box className={classes.cancel} onClick={()=>{setOpen(false)}}>CANCEL</Box>
+                            {/* <Box className={classes.cancel} onClick={()=>{setOpen(false)}}>CANCEL</Box> */}
                             <Box className={classes.generate} onClick={handleSubmit}>DEPOSIT</Box>
-                </Box>
-
               </Box>
               </Box>
               }

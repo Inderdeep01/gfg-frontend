@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DoneIcon from '@mui/icons-material/Done';
-import PayUsingCard from "./PayUsingCard";
+import PayUsingCard from "./PayByCard/PayUsingCard";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { NetworkGradient, NetworkImage } from "../utils/gradientAndImages";
 import CardDelete from "./CardDelete";
@@ -354,11 +354,11 @@ const CardDetails = ({setTransact,cardId}) => {
       },
       cursor:card?.isBlocked?'not-allowed':'pointer'
     }}
-    onClick={()=>{if(card.isBlocked==false){setOpen(true)}}}>Pay Using card</Box>
+    onClick={()=>{if(card.isBlocked===false){setOpen(true)}}}>Pay Using card</Box>
 
 
 
-    <PayUsingCard open={open} setOpen={setOpen} cardNumber={card?.cardNumber}/>
+    <PayUsingCard open={open} setOpen={setOpen} cardNumber={card?.cardNumber} card={card}/>
     <CardDelete open={del} setOpen={setDel} card={card}/>
     <BlockCard open={block} setOpen={setBlock} card={card} method="block"/>
     <BlockCard open={unblock} setOpen={setUnBlock} card={card} method="unblock"/>
