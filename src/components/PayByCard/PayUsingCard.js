@@ -29,6 +29,34 @@ const useStyle=makeStyles((theme)=>({
     },
     // padding: theme.spacing(2, 4, 3),
   },
+  cancel: {
+    width: "115px",
+    height: "40px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: "20px",
+    // background:'#0050ff',
+    border: "1px solid #1979e6",
+    color: "#1979e6",
+    cursor: "pointer",
+    "&:hover": {
+      background: "#1979e6",
+      color: "white",
+    },
+  },
+  generate: {
+    width: "115px",
+    height: "40px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: "20px",
+    background: "#1979e6",
+    // border: "1px solid #1979e6",
+    color: "white",
+    cursor: "pointer",
+  },
 }))
 const PayUsingCard = ({open,setOpen,card}) => {
   useEffect(()=>{
@@ -39,6 +67,8 @@ const PayUsingCard = ({open,setOpen,card}) => {
       setPINPage(false);
       setAmountPage(false);
       setRecipientPage(true);
+      setAccount('');
+      setAmount('');
     }
   },[open])
   const classes=useStyle();
@@ -133,7 +163,7 @@ const PayUsingCard = ({open,setOpen,card}) => {
                               bottom:'-50px'
                           }}>
                               <Box className={classes.cancel} onClick={()=>{setOpen(false)}}>CANCEL</Box>
-                              <Box className={classes.generate}>RETRY</Box>
+                              <Box className={classes.generate} onClick={()=>{setError('');setRecipientPage(true)}}>RETRY</Box>
                           </Box>
                       </Box>
                   :

@@ -14,7 +14,7 @@ const useStyle=makeStyles((theme)=>({
     outer:{
         width:'80%',
         background:'rgb(237, 237, 244)',
-        height:'100%',
+        height:'92.5vh',
         [theme.breakpoints.down("sm")]:{
             width:'100%',
         }
