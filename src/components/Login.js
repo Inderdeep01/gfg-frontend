@@ -30,9 +30,9 @@ const useStyle=makeStyles((theme)=>({
     "& .MuiFilledInput-root:hover": {
       // backgroundColor: "rgb(250, 232, 241)",
       // Reset on touch devices, it doesn't add specificity
-      "@media (hover: none)": {
-        backgroundColor: "rgb(232, 241, 250)"
-      },
+      // "@media (hover: none)": {
+      //   backgroundColor: "rgb(232, 241, 250)"
+      // },
     },
     "& .MuiFilledInput-root.Mui-focused": {
       // backgroundColor: "rgb(250, 241, 232)"
@@ -99,7 +99,7 @@ const Login = () => {
     password:joi.string().min(8).required()
   })
   const handleSubmit=async()=>{
-    var res=loginSchema.validate({email,password});
+    var res=loginSchema.validate({email:email.trim(),password});
     var er=res.error;
     if(er){
       er=er.details[0].message.replace(/"/g, "" );
@@ -110,7 +110,7 @@ const Login = () => {
       })
     }
     else{
-      dispatch(login(email,password));
+      dispatch(login(email.trim(),password));
     }
   }
   return (
