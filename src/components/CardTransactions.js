@@ -58,7 +58,7 @@ const useStyle=makeStyles((theme)=>({
     },
     center:{
         padding:'5px',
-        color:'#7e7e8f',
+        // color:'#7e7e8f',
     },
 }))
 const CardTransactions = ({setTransact,cardId}) => {
@@ -144,6 +144,7 @@ const CardTransactions = ({setTransact,cardId}) => {
         '#2e2e3a',
         '#6b12b1'
     ]
+    console.log(transactions);
   return (
     <Box className={classes.outer}>
         <Box className={classes.back} onClick={()=>{setTransact(false)}}><ArrowBackIosNewIcon sx={{fontSize:'30px'}}/></Box>
@@ -188,9 +189,9 @@ const CardTransactions = ({setTransact,cardId}) => {
                     loader={<span>Loading....</span>}
                     scrollableTarget="scrollableDiv"
                 >
-                {transactions?.map((transaction)=>{
+                {transactions?.map((transaction,index)=>{
                     return (
-                        <Box sx={{
+                        <Box key={index} sx={{
                             width:'100%',
                             height:'70px',
                             display:'flex',
@@ -220,10 +221,10 @@ const CardTransactions = ({setTransact,cardId}) => {
                                     <Box sx={{fontSize:'13px'}}>{transaction?.from!==null?transaction?.card?.purpose:'IPBS Bank'}</Box>
                                 </Box>
                             </Box>
-                            <Box className={classes.center} sx={{width:'40%'}}>{transaction?.to?.firstName} {transaction?.to?.lastName}</Box>
+                            <Box className={classes.center} sx={{width:'40%'}}>{(transaction?.from?._id===userInfo?._id)?(transaction?.to?.firstName+' '+transaction?.to?.lastName):(transaction?.from?.firstName+' '+transaction?.from?.lastName)}</Box>
                             <Box className={classes.center} sx={{
                                 width:'20%',
-                                color:transaction?.from===null?'green':'red',
+                                color:(transaction?.from?._id===userInfo?._id)?'red':'green',
                                 fontWeight:'500'
                             }}
                             > {transaction?.from===null?'+':'-'} {transaction?.currency==='INR'?'₹':'$'} {transaction?.amount}</Box>

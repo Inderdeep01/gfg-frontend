@@ -64,6 +64,22 @@ const useStyle=makeStyles((theme)=>({
             color:'white',
         }
       },
+      close:{
+        width:'80%',
+        height:'40px',
+        display:'flex',
+        alignItems:'center',
+        justifyContent:'center',
+        borderRadius:'10px',
+        background:'#1979e6',
+        border:'1px solid #1979e6',
+        color:'white',
+        cursor:'pointer',
+        '&:hover':{
+            background:'#1979e6',
+            color:'white',
+        }
+      }
 }))
 const GeneratingNewCard = ({open,setOpen,body}) => {
     const classes=useStyle();
@@ -187,7 +203,7 @@ const GeneratingNewCard = ({open,setOpen,body}) => {
                 }}>
                     <CheckCircleIcon sx={{fontSize:'50px',color:'green'}}/>
                     <Box sx={{color:'green',fontWeight:'bold',fontSize:'20px',marginTop:'30px'}}>Card Generated SuccessFully</Box>
-                    <Box sx={{color:'red'}}>{error}</Box>
+                    {/* <Box sx={{color:'red'}}>{error}</Box>*/}
                     <Box sx={{
                         width:'100%',
                         display:'flex',
@@ -197,7 +213,7 @@ const GeneratingNewCard = ({open,setOpen,body}) => {
                         position:'relative',
                         bottom:'-50px'
                     }}>
-
+                        <Box className={classes.close}>CLOSE</Box>
                     </Box>
                 </Box>
                 }

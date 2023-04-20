@@ -68,6 +68,9 @@ const useStyle=makeStyles((theme)=>({
         '&:hover':{
             transform:'translateY(-10px)',
         },
+        [theme.breakpoints.down("xs")]:{
+            width:'25vw'
+        }
     },
     rupees:{
         background:'rgb(25, 121, 230,0.2)',
@@ -188,7 +191,7 @@ const Balance = ({setTransact}) => {
                              <span style={{
                                 fontSize:'30px',
                                 fontWeight:'bold'
-                            }}>{Math.floor(curr?.balance)}</span></Box>
+                            }}>{curr?.balance}</span></Box>
                         </Box>
                     )
                 })}

@@ -57,6 +57,18 @@ const useStyle=makeStyles((theme)=>({
     color: "white",
     cursor: "pointer",
   },
+  close:{
+    width: "80%",
+    height: "40px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: "10px",
+    background: "#1979e6",
+    // border: "1px solid #1979e6",
+    color: "white",
+    cursor: "pointer",
+  }
 }))
 const PayUsingCard = ({open,setOpen,card}) => {
   useEffect(()=>{
@@ -137,7 +149,7 @@ const PayUsingCard = ({open,setOpen,card}) => {
                       <CircularProgress size={50} sx={{
                           color:'rgb(25, 120, 228)',
                       }}/>
-                      <Box sx={{color:'rgb(25, 120, 228)',fontWeight:'bold',fontSize:'20px',marginTop:'30px'}}>Depositing money in your Account...</Box>
+                      <Box sx={{color:'rgb(25, 120, 228)',fontWeight:'bold',fontSize:'20px',marginTop:'30px'}}>Processing Your Payment...</Box>
                       <Box sx={{color:'rgb(25, 120, 228)'}}>Have Patience</Box>
                   </Box>
                   :
@@ -177,8 +189,8 @@ const PayUsingCard = ({open,setOpen,card}) => {
                       flexDirection:'column',
                   }}>
                       <CheckCircleIcon sx={{fontSize:'50px',color:'green'}}/>
-                      <Box sx={{color:'green',fontWeight:'bold',fontSize:'20px',marginTop:'30px'}}>Money Deposited SuccessFully</Box>
-                      <Box sx={{color:'red'}}>{error}</Box>
+                      <Box sx={{color:'green',fontWeight:'bold',fontSize:'20px',marginTop:'30px'}}>Payment Successfull</Box>
+                      {/* <Box sx={{color:'red'}}>{error}</Box> */}
                       <Box sx={{
                           width:'100%',
                           display:'flex',
@@ -188,7 +200,10 @@ const PayUsingCard = ({open,setOpen,card}) => {
                           position:'relative',
                           bottom:'-50px'
                       }}>
-  
+                        <Box className={classes.close}
+                          onClick={()=>setOpen(false)}>
+                            Close
+                          </Box>
                       </Box>
                   </Box>
                   :

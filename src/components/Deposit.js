@@ -167,9 +167,9 @@ const Deposit = ({ open, setOpen }) => {
                 })
                 setLoading(false);
                 setSuccess(true);
-                setTimeout(()=>{
-                  setOpen(false);
-                },5000)
+                // setTimeout(()=>{
+                //   setOpen(false);
+                // },5000)
             }
             catch(err)
             {
@@ -184,16 +184,40 @@ const Deposit = ({ open, setOpen }) => {
 var b = ['', '', 'twenty','Thirty','Forty','Fifty', 'Sixty','Seventy','Eighty','Ninety'];
 
 function inWords (n) {
-    if ((n = n.toString()).length > 9) return 'overflow';
-    n = ('000000000' + n).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
-    if (!n) return; var str = '';
-    str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
-    str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
-    str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
-    str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
-    str+=' Only'
-    // str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) + 'only ' : '';
-    return str;
+  if (n < 0)
+  return false;
+var single_digit = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine']
+var double_digit = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen']
+var below_hundred = ['Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety']
+if (n === 0) return 'Zero'
+function translate(n) {
+var word = ""
+if (n < 10) {
+  word = single_digit[n] + ' '
+}
+else if (n < 20) {
+  word = double_digit[n - 10] + ' '
+}
+else if (n < 100) {
+  var rem = translate(n % 10)
+  word = below_hundred[(n - n % 10) / 10 - 2] + ' ' + rem
+}
+else if (n < 1000) {
+  word = single_digit[Math.trunc(n / 100)] + ' Hundred ' + translate(n % 100)
+}
+else if (n < 100000) {
+  word = translate(parseInt(n / 1000)).trim() + ' Thousand ' + translate(n % 1000)
+}
+else if (n < 10000000) {
+  word = translate(parseInt(n / 100000)).trim() + ' Lakh ' + translate(n % 100000)
+}
+else {
+  word = translate(parseInt(n / 10000000)).trim() + ' Crore ' + translate(n % 10000000)
+}
+return word
+}
+var result = translate(n) 
+return result.trim()+' Only'
 }
 
   return (
@@ -294,7 +318,14 @@ function inWords (n) {
                         focused
                         value={amount}
                         onFocus={(e) => e.target.addEventListener("wheel", function (e) { e.preventDefault() }, { passive: false })}
-                        onChange={(e)=>{setAmount(e.target.value)}}
+                        onChange={(e)=>{
+                          if((e.target.value)<=10000000 && (e.target.value)>0){
+                            setAmount(e.target.value);
+                          }
+                          else if(e.target.value?.length===0){
+                            setAmount('');
+                          }
+                        }}
                         InputProps={{style: {width: `${amount?.length===0?'30':amount?.length*30}px`},disableUnderline: true }}
                         className={classes.textfield}
                         />
@@ -371,17 +402,17 @@ function inWords (n) {
                 }}>
                     <CheckCircleIcon sx={{fontSize:'50px',color:'green'}}/>
                     <Box sx={{color:'green',fontWeight:'bold',fontSize:'20px',marginTop:'30px'}}>Money Deposited SuccessFully</Box>
-                    <Box sx={{color:'red'}}>{error}</Box>
+                    {/* <Box sx={{color:'red'}}>{error}</Box> */}
                     <Box sx={{
                         width:'100%',
                         display:'flex',
                         justifyContent:'center',
                         alignItems:'center',
                         gap:'50px',
-                        position:'relative',
-                        bottom:'-50px'
+                        position:'absolute',
+                        bottom:'10px'
                     }}>
-
+                      <Box className={classes.generate} onClick={()=>{setOpen(false)}}>CLOSE</Box>
                     </Box>
                 </Box>
                 }

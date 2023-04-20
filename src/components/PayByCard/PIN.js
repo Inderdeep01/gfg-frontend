@@ -58,8 +58,7 @@ const PIN = ({token,amount,account,setLoading,setError,setSuccess,setAmountPage,
         setSuccess(false);
         setLoading(true);
         const pin=p1+p2+p3+p4;
-        try
-            {
+        try{
                 const config={
                     headers:{
                         "Content-Type":'application/json',
@@ -89,9 +88,6 @@ const PIN = ({token,amount,account,setLoading,setError,setSuccess,setAmountPage,
                 })
                 setLoading(false);
                 setSuccess(true);
-                setTimeout(()=>{
-                    setOpen(false);
-                },6000)
             }
             catch(err)
             {

@@ -38,6 +38,11 @@ const useStyle=makeStyles((theme)=>({
         top: "20px",
         color: "rgb(25, 121, 230)",
       },
+      div:{
+        [theme.breakpoints.down("xs")]:{
+          marginTop:'80px'
+        }
+      }
 }))
 const Recipient = ({account,setAccount,setRecipientPage,setAmountPage,setOpen}) => {
     const handleSubmit=()=>{
@@ -58,7 +63,7 @@ const Recipient = ({account,setAccount,setRecipientPage,setAmountPage,setOpen}) 
       >
         <ArrowBackIosNewIcon sx={{ fontSize: "30px" }} />
       </Box>
-        <Box sx={{fontSize:'25px',fontWeight:'600',marginTop:'40px'}}>Enter Receiver's Bank Details</Box>
+        <Box sx={{fontSize:'25px',fontWeight:'600',marginTop:'40px'}} className={classes.div}>Enter Receiver's Bank Details</Box>
         <Box sx={{
             width:'100%',
             height:'100%',
