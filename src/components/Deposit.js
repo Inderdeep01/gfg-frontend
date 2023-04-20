@@ -111,7 +111,7 @@ const useStyle = makeStyles((theme) => ({
     color:'rgb(25, 121, 230)',
 },
 }));
-const Deposit = ({ open, setOpen }) => {
+const Deposit = ({ open, setOpen ,setTransactions,transactions}) => {
   useEffect(()=>{
     if(open===false){
       setAmount('');
@@ -157,7 +157,7 @@ const Deposit = ({ open, setOpen }) => {
                 const payload=[
                   {
                     currency:token,
-                    balance:current.balance+JSON.parse(amount),
+                    balance:((current?.balance)?JSON.parse(current?.balance):0)+JSON.parse(amount)
                   },
                   ...left,
                 ]
@@ -167,6 +167,11 @@ const Deposit = ({ open, setOpen }) => {
                 })
                 setLoading(false);
                 setSuccess(true);
+                console.log(data);
+                setTransactions([
+                  data
+                  ,...transactions
+                ])
                 // setTimeout(()=>{
                 //   setOpen(false);
                 // },5000)
@@ -387,7 +392,7 @@ return result.trim()+' Only'
                             bottom:'-50px'
                         }}>
                             <Box className={classes.cancel} onClick={()=>{setOpen(false)}}>CANCEL</Box>
-                            <Box className={classes.generate} onClick={handleSubmit}>RETRY</Box>
+                            <Box className={classes.generate} sx={{ width:'115px',borderRadius:'20px' }} onClick={handleSubmit}>RETRY</Box>
                         </Box>
                     </Box>
                 }

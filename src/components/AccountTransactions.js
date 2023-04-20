@@ -58,14 +58,15 @@ const useStyle=makeStyles((theme)=>({
     },
     center:{
         padding:'5px',
-        color:'#7e7e8f',
+        // color:'#7e7e8f',
     },
 }))
-const AccountTransactions = ({setTransact}) => {
-    const [more,setMore]=useState();
+const AccountTransactions = ({setTransact,transactions,setTransactions}) => {
+
+    const [more,setMore]=useState(true);
     const classes=useStyle();
-    const [transactions,setTransactions]=useState([]);
     const {userInfo}=useSelector(state=>state.userLogin);
+    const {balances}=useSelector(state=>state.accountBalance);
     const [loading,setLoading]=useState(false);
     const [error,setError]=useState('');
     const [page,setPage]=useState(1);
@@ -94,48 +95,10 @@ const AccountTransactions = ({setTransact}) => {
             setError(e);
         }
     }
+
     useEffect(()=>{
         fetchTransactions();
     },[])
-    // const transactions=[
-    //     {
-    //         network:'VISA',
-    //         cardNo:'100000000000000000',
-    //         cardPurpose:'Saving Card',
-    //         amount:'1000',
-    //         currency:'INR',
-    //         to:'Money Batish'
-    //     },
-    //     {
-    //         network:'IPBS',
-    //         cardNo:'100000000000000000',
-    //         cardPurpose:'Saving Card',
-    //         amount:'1000',
-    //         currency:'INR',
-    //         to:'Money Batish'
-    //     },
-    //     {
-    //         network:'Mastercard',
-    //         cardNo:'100000000000000000',
-    //         cardPurpose:'Saving Card',
-    //         amount:'1000',
-    //         currency:'INR',
-    //         to:'Money Batish'
-    //     }
-    // ]
-    const obj={
-        'VISA':'/img/VISA.png',
-        'Mastercard':'/img/Mastercard.png',
-        'IPBS':'/img/IPBS.png',
-        'Amex':'/img/Amex.png',
-        'RuPay':'img/RuPay.png'
-    }
-    const colors=[
-        '#fa3434',
-        '#044ad2',
-        '#2e2e3a',
-        '#6b12b1'
-    ]
     console.log(transactions);
   return (
     <Box className={classes.outer}>
@@ -174,10 +137,10 @@ const AccountTransactions = ({setTransact}) => {
                     },
                 }}>
                 <InfiniteScroll
-                    dataLength={page*20}
+                    dataLength={page!==1?(page-1)*20:20}
                     next={fetchTransactions}
                     // inverse={true} //
-                    hasMore={true}
+                    hasMore={more}
                     loader={<span>Loading....</span>}
                     scrollableTarget="scrollableDiv"
                 >

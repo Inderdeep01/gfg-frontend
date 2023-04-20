@@ -213,7 +213,7 @@ const GeneratingNewCard = ({open,setOpen,body}) => {
                         position:'relative',
                         bottom:'-50px'
                     }}>
-                        <Box className={classes.close}>CLOSE</Box>
+                        <Box className={classes.close} onClick={()=>{setOpen(false)}}>CLOSE</Box>
                     </Box>
                 </Box>
                 }

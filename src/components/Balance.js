@@ -125,7 +125,7 @@ const useStyle=makeStyles((theme)=>({
         borderRadius:'20px',
     }
 }))
-const Balance = ({setTransact}) => {
+const Balance = ({setTransact,setTransactions,transactions}) => {
     const [copy,setCopy]=useState(false);
     const classes=useStyle();
     const {userInfo}=useSelector(state=>state.userLogin)
@@ -136,7 +136,6 @@ const Balance = ({setTransact}) => {
             setCopy(false)
         },5000)
     }
-
     const {balances,loading,error}=useSelector(state=>state.accountBalance);
     const dispatch=useDispatch();
 
@@ -197,7 +196,7 @@ const Balance = ({setTransact}) => {
                 })}
             </Box>
         </Box>
-        <Deposit open={open} setOpen={setOpen}/>
+        <Deposit open={open} setOpen={setOpen} setTransactions={setTransactions} transactions={transactions}/>
     </Box>
   )
 }
