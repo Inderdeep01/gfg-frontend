@@ -226,7 +226,7 @@ const GenerateCard = ({open,setOpen}) => {
                         <Box sx={{position:'absolute',bottom:'15px',color:'white',fontSize:'12px'}}>CardHolder Name - <span style={{fontSize:'15px',fontWeight:'700'}}>{userInfo?.firstName+' '+userInfo?.lastName}</span></Box>
                     </ThemeProvider>
                 </Box>
-                <Box sx={{width:'100%',color:'red',display:'flex',justifyContent:'center'}}>{err}</Box>
+                <Box sx={{width:'100%',color:'red',display:'flex',justifyContent:'center',alignItems:'center',textAlign:'center'}}>{err}</Box>
                 <Box sx={{
                     width:'100%',
                     display:'flex',

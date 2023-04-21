@@ -1,6 +1,6 @@
 import { makeStyles } from '@material-ui/core';
 import { Box, TextField } from '@mui/material'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { URL } from '../../ServerURL';
@@ -96,7 +96,9 @@ const PIN = ({token,amount,account,setLoading,setError,setSuccess,setAmountPage,
                 setError(e);
             }
       };
-
+      useEffect(()=>{
+        ref1.current.focus();
+      },[])
   return (
     <Box sx={{
         width:'100%',
@@ -136,7 +138,7 @@ const PIN = ({token,amount,account,setLoading,setError,setSuccess,setAmountPage,
             alignItems:'center',
             gap:'30px',
             width:'100%',
-            height:'50%',
+            height:'25%',
         }}>
             <TextField inputRef={ref1} type={visible?'text':'password'} variant='outlined' value={p1} sx={{width:'50px'}} InputProps={{style:{fontSize:'20px',paddingLeft:'5px'}}} onChange={(e)=>{
                 if(e.target.value?.length<=1){
@@ -174,11 +176,12 @@ const PIN = ({token,amount,account,setLoading,setError,setSuccess,setAmountPage,
                 }
                 if(e.target.value===''){
                     ref3.current.focus();
+                    // ref3.current.setSelectionRange(selectionStart, selectionEnd)
                 }
             }}/>
         </Box>
 
-        <Box sx={{color:'#2781e8',display:'flex',alignItems:'center',gap:'10px',fontSize:'20px',fontWeight:'500',position:'relative',top:'-100px',cursor:'pointer'}} onClick={()=>{setVisible(!visible)}}>{visible?<VisibilityOff/>:<Visibility/>}{visible?'HIDE':'SHOW'}</Box>
+        <Box sx={{color:'#2781e8',display:'flex',alignItems:'center',gap:'10px',fontSize:'20px',fontWeight:'500',position:'relative',cursor:'pointer'}} onClick={()=>{setVisible(!visible)}}>{visible?<VisibilityOff/>:<Visibility/>}{visible?'HIDE':'SHOW'}</Box>
         <Box className={classes.generate} onClick={handleSubmit} sx={{
             position:'absolute',
             bottom:'50px'
