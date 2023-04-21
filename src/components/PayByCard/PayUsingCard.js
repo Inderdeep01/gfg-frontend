@@ -163,7 +163,7 @@ const PayUsingCard = ({open,setOpen,card}) => {
                           flexDirection:'column',
                       }}>
                           <GppMaybeIcon sx={{fontSize:'50px',color:'red'}}/>
-                          <Box sx={{color:'red',fontWeight:'bold',fontSize:'20px',marginTop:'30px'}}>Failed to Deposit Money</Box>
+                          <Box sx={{color:'red',fontWeight:'bold',fontSize:'20px',marginTop:'30px'}}>Payment Failed</Box>
                           <Box sx={{color:'red'}}>{error}</Box>
                           <Box sx={{
                               width:'100%',
@@ -197,8 +197,8 @@ const PayUsingCard = ({open,setOpen,card}) => {
                           justifyContent:'center',
                           alignItems:'center',
                           gap:'50px',
-                          position:'relative',
-                          bottom:'-50px'
+                          position:'absolute',
+                          bottom:'50px'
                       }}>
                         <Box className={classes.close}
                           onClick={()=>setOpen(false)}>

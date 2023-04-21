@@ -35,7 +35,7 @@ const useStyle=makeStyles((theme)=>({
       },
       textfield:{
         [theme.breakpoints.down("xs")]:{
-            width:'60%'
+            width:'55%'
         },
         '& label.Mui-focused': {
             color: 'white',
@@ -79,7 +79,7 @@ const useStyle=makeStyles((theme)=>({
         }
       },
       card:{
-        width:'350px',
+        width:'70%',
         height:'200px',
         padding:'20px',
         marginBottom:'10px',
@@ -87,7 +87,7 @@ const useStyle=makeStyles((theme)=>({
         position:'relative',
         boxShadow: 'rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px',
         [theme.breakpoints.down("xs")]:{
-            width:'75%',
+            width:'80%',
         }
       },
       img:{
@@ -108,6 +108,13 @@ const useStyle=makeStyles((theme)=>({
       }
 }))
 const GenerateCard = ({open,setOpen}) => {
+  useEffect(()=>{
+    if(open===false){
+      setPin('');
+      setPurpose('');
+      setErr('');
+    }
+  },[open])
     const {userInfo}=useSelector(state=>state.userLogin);
     const [value,setValue]=useState('IPBS');
     const classes=useStyle();
@@ -130,7 +137,7 @@ const GenerateCard = ({open,setOpen}) => {
 
       const schema=joi.object({
         purpose:joi.string().required(),
-        pin:joi.string().required().min(4),
+        pin:joi.string().required().min(4).max(4),
       })
       const submitHandler=()=>{
         var {error}=schema.validate({purpose,pin});

@@ -139,34 +139,50 @@ const PIN = ({token,amount,account,setLoading,setError,setSuccess,setAmountPage,
             height:'50%',
         }}>
             <TextField inputRef={ref1} type={visible?'text':'password'} variant='outlined' value={p1} sx={{width:'50px'}} InputProps={{style:{fontSize:'20px',paddingLeft:'5px'}}} onChange={(e)=>{
-                setP1('');
-                setP1(e.target.value);
+                if(e.target.value?.length<=1){
+                    setP1(e.target.value);
+                }
                 if(e.target.value!=''){
                     ref2.current.focus();
                 }
             }}/>
             <TextField inputRef={ref2} type={visible?'text':'password'} variant='outlined' value={p2} sx={{width:'50px'}} InputProps={{style:{fontSize:'20px',paddingLeft:'5px'}}} onChange={(e)=>{
-                setP2('');
-                setP2(e.target.value);
+                if(e.target.value?.length<=1){
+                    setP2(e.target.value);
+                }
                 if(e.target.value!=''){
                     ref3.current.focus();
                 }
+                else if(e.target.value===''){
+                    ref1.current.focus();
+                }
             }}/>
             <TextField inputRef={ref3} type={visible?'text':'password'} variant='outlined' value={p3} sx={{width:'50px'}} InputProps={{style:{fontSize:'20px',paddingLeft:'5px'}}} onChange={(e)=>{
-                setP3('');
-                setP3(e.target.value);
+                if(e.target.value?.length<=1){
+                    setP3(e.target.value);
+                }
                 if(e.target.value!=''){
                     ref4.current.focus();
                 }
+                else if(e.target.value===''){
+                    ref2.current.focus();
+                }
             }}/>
             <TextField inputRef={ref4} type={visible?'text':'password'} variant='outlined' value={p4} sx={{width:'50px'}} InputProps={{style:{fontSize:'20px',paddingLeft:'5px'}}} onChange={(e)=>{
-                setP4('');
-                setP4(e.target.value);
+                if(e.target.value?.length<=1){
+                    setP4(e.target.value);
+                }
+                if(e.target.value===''){
+                    ref3.current.focus();
+                }
             }}/>
         </Box>
 
-        <Box sx={{color:'#2781e8',display:'flex',alignItems:'center',gap:'10px',fontSize:'20px',fontWeight:'500',position:'relative',top:'-80px',cursor:'pointer'}} onClick={()=>{setVisible(!visible)}}>{visible?<VisibilityOff/>:<Visibility/>}{visible?'HIDE':'SHOW'}</Box>
-        <Box className={classes.generate} onClick={handleSubmit}>PAY</Box>
+        <Box sx={{color:'#2781e8',display:'flex',alignItems:'center',gap:'10px',fontSize:'20px',fontWeight:'500',position:'relative',top:'-100px',cursor:'pointer'}} onClick={()=>{setVisible(!visible)}}>{visible?<VisibilityOff/>:<Visibility/>}{visible?'HIDE':'SHOW'}</Box>
+        <Box className={classes.generate} onClick={handleSubmit} sx={{
+            position:'absolute',
+            bottom:'50px'
+        }}>PAY</Box>
     </Box>
   )
 }

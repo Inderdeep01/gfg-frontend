@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import AddCard from './AddCard';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import { useDispatch, useSelector } from 'react-redux';
@@ -162,8 +162,20 @@ const Sidebar = ({side,setSide}) => {
         }
         setSide(false);
     }
+    const handleOusideClick=(e)=>{
+        if(ref.current && !ref.current.contains(e.target)){
+            setSide(false);
+        }
+    }
+    const ref=useRef();
+    useEffect(()=>{
+        document.addEventListener("mousedown", handleOusideClick);
+        return () => {
+            document.removeEventListener("mousedown", handleOusideClick);
+        };
+    },[ref])
   return (
-    <Box className={`${classes.outer} clickbox`} sx={{left:side?'0px':'-400px'}}>
+    <Box className={`${classes.outer} clickbox`} sx={{left:side?'0px':'-400px'}} ref={ref}>
         <Box className={classes.mycards}>
             <Box className={classes.inner}>
                 <Box className={classes.cardHead} onClick={()=>{setShowCards(!showCards)}}>

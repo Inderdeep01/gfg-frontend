@@ -200,6 +200,7 @@ const GeneratingNewCard = ({open,setOpen,body}) => {
                     justifyContent:'center',
                     alignItems:'center',
                     flexDirection:'column',
+                    position:'relative'
                 }}>
                     <CheckCircleIcon sx={{fontSize:'50px',color:'green'}}/>
                     <Box sx={{color:'green',fontWeight:'bold',fontSize:'20px',marginTop:'30px'}}>Card Generated SuccessFully</Box>
@@ -210,8 +211,8 @@ const GeneratingNewCard = ({open,setOpen,body}) => {
                         justifyContent:'center',
                         alignItems:'center',
                         gap:'50px',
-                        position:'relative',
-                        bottom:'-50px'
+                        position:'absolute',
+                        bottom:'30px'
                     }}>
                         <Box className={classes.close} onClick={()=>{setOpen(false)}}>CLOSE</Box>
                     </Box>
