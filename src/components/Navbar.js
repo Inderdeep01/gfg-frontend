@@ -106,7 +106,7 @@ const Navbar = ({side,setSide}) => {
     const classes=useStyle();
   return (
     <Box className={classes.outer}>
-      <Box className={`${classes.ham} ${side && classes.hamAnimateIn} ${!side && classes.hamAnimateOut}`}
+      <Box id="ham" className={`${classes.ham} ${side && classes.hamAnimateIn} ${!side && classes.hamAnimateOut}`}
       onClick={()=>{
         setSide(!side);
       }}>

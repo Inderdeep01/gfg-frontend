@@ -14,6 +14,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import { getCards } from '../store/Actions/cardActions';
+import PayUsingCard from './Transfer/PayUsingCard';
 
 const useStyle=makeStyles((theme)=>({
     outer:{
@@ -138,6 +139,7 @@ const Sidebar = ({side,setSide}) => {
     const dispatch=useDispatch();
     var loc=useLocation().pathname.split('/')[1];
     const {loading,cards,error}=useSelector(state=>state.cardsList);
+    const [open,setOpen]=useState(false);
 
     // console.log(cards);
 
@@ -163,7 +165,7 @@ const Sidebar = ({side,setSide}) => {
         setSide(false);
     }
     const handleOusideClick=(e)=>{
-        if(ref.current && !ref.current.contains(e.target)){
+        if(ref.current && !ref.current.contains(e.target) && !document.getElementById("ham").contains(e.target)){
             setSide(false);
         }
     }
@@ -197,9 +199,8 @@ const Sidebar = ({side,setSide}) => {
         </Box>
         <Box className={classes.menu}>
             <Box className={classes.menuItem} sx={{background:(loc==='' || loc==='dashboard')?'#f4f4f4':'transparent'}} data="dashboard" onClick={handleClick}><DashboardOutlinedIcon sx={{color:'#70707c',fontSize:'20px',marginLeft:'10px',marginRight:'10px'}}/>DashBoard</Box>
-            <Box className={classes.menuItem} sx={{background:loc==='transfer'?'#f4f4f4':'transparent'}} data="transfer" onClick={handleClick}><MonetizationOnOutlinedIcon sx={{color:'#70707c',fontSize:'20px',marginLeft:'10px',marginRight:'10px'}}/>Transfer</Box>
+            <Box className={classes.menuItem} sx={{background:loc==='transfer'?'#f4f4f4':'transparent'}} data="transfer" onClick={()=>setOpen(true)}><MonetizationOnOutlinedIcon sx={{color:'#70707c',fontSize:'20px',marginLeft:'10px',marginRight:'10px'}}/>Transfer</Box>
             <Box className={classes.menuItem} sx={{background:loc==='forex'?'#f4f4f4':'transparent'}} data="forex" onClick={handleClick}><CurrencyExchangeIcon sx={{color:'#70707c',fontSize:'20px',marginLeft:'10px',marginRight:'10px'}}/>Forex</Box>
-            <Box className={classes.menuItem} sx={{background:loc==='notifications'?'#f4f4f4':'transparent'}} data="notifications" onClick={handleClick}><NotificationsIcon sx={{color:'#70707c',fontSize:'20px',marginLeft:'10px',marginRight:'10px'}}/> Notifications</Box>
             <Box className={classes.menuItem} sx={{background:loc==='settings'?'#f4f4f4':'transparent'}} data="settings" onClick={handleClick}><SettingsOutlinedIcon sx={{color:'#70707c',fontSize:'20px',marginLeft:'10px',marginRight:'10px'}}/> Settings</Box>
         </Box>
         <Box className={classes.logout}>
@@ -207,6 +208,7 @@ const Sidebar = ({side,setSide}) => {
                 dispatch(logout());
             }}>Logout</Box>
         </Box>
+        <PayUsingCard open={open} setOpen={setOpen} card={null}/>
     </Box>
   )
 }

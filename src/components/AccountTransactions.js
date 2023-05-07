@@ -1,13 +1,15 @@
 
 import { CircularProgress, makeStyles } from '@material-ui/core';
 import { Box } from '@mui/material';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { URL } from '../ServerURL';
 import axios from 'axios';
 import { NetworkGradient, NetworkImage } from '../utils/gradientAndImages';
-import InfiniteScroll, {} from 'react-infinite-scroll-component'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import {EventSourcePolyfill as EventSource} from 'event-source-polyfill'
+import { SET_ACCOUNT_TRANSACTIONS } from '../store/Constants/TransactionsConstant';
 
 const useStyle=makeStyles((theme)=>({
     outer:{
@@ -61,7 +63,7 @@ const useStyle=makeStyles((theme)=>({
         // color:'#7e7e8f',
     },
 }))
-const AccountTransactions = ({setTransact,transactions,setTransactions}) => {
+const AccountTransactions = ({setTransact}) => {
 
     const [more,setMore]=useState(true);
     const classes=useStyle();
@@ -70,6 +72,8 @@ const AccountTransactions = ({setTransact,transactions,setTransactions}) => {
     const [loading,setLoading]=useState(false);
     const [error,setError]=useState('');
     const [page,setPage]=useState(1);
+    const {transactions}=useSelector(state=>state.accountTransactions);
+    const dispatch=useDispatch();
     const fetchTransactions=async()=>{
         try{
             const config={
@@ -79,13 +83,13 @@ const AccountTransactions = ({setTransact,transactions,setTransactions}) => {
                 }
             }
             const {data}=await axios.get(`${URL}/getTx?page=${page}`,config);
-            // console.log(data);
+            console.log(data);
             setPage(page+1);
             if(data?.length===0){
                 setMore(false);
             }
             else{
-                setTransactions([...transactions,...data]);
+                dispatch({type:SET_ACCOUNT_TRANSACTIONS,payload:[...transactions,...data]});
             }
         }
         catch(err)
@@ -99,7 +103,25 @@ const AccountTransactions = ({setTransact,transactions,setTransactions}) => {
     useEffect(()=>{
         fetchTransactions();
     },[])
-    console.log(transactions);
+    // console.log(transactions);
+
+
+    // useEffect(()=>{
+    //     const headers = {
+    //             Authorization:`Bearer ${userInfo.token}`,
+    //             'custom':'This is the header of sse'
+    //         }
+    //     let sse = new EventSource(`${URL}/getTx/sse`,{headers:headers})
+    //     console.log('Event Set');
+    //     sse.onmessage = (msg)=> {
+    //         console.log('Hello')
+    //         const tx = JSON.parse(msg.data)
+    //         // console.log(transactions)
+    //         console.log(tx)
+    //         // setTransactions([tx,...transactions])
+    //     }
+    // },[])
+    const ref=useRef();
   return (
     <Box className={classes.outer}>
         <Box className={classes.back} onClick={()=>{setTransact(false)}}><ArrowBackIosNewIcon sx={{fontSize:'30px'}}/></Box>
@@ -135,18 +157,18 @@ const AccountTransactions = ({setTransact,transactions,setTransactions}) => {
                     '&::-webkit-scrollbar':{
                             display:'none'
                     },
-                }}>
+                }} id="accountTransactionDiv">
                 <InfiniteScroll
-                    dataLength={page!==1?(page-1)*20:20}
+                    dataLength={transactions?.length}
                     next={fetchTransactions}
-                    // inverse={true} //
+                    // inverse={true}
                     hasMore={more}
-                    loader={<span>Loading....</span>}
-                    scrollableTarget="scrollableDiv"
+                    loader={<Box sx={{width:'100%',display:'flex',justifyContent:'center'}}><CircularProgress size={30} sx={{color:'#1979e6'}}/></Box>}
+                    scrollableTarget="accountTransactionDiv"
                 >
-                {transactions?.map((transaction)=>{
+                {transactions?.map((transaction,index)=>{
                     return (
-                        <Box sx={{
+                        <Box key={index} sx={{
                             width:'100%',
                             height:'70px',
                             display:'flex',

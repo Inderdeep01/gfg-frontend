@@ -11,6 +11,9 @@ import Deposit from './Deposit';
 import axios from 'axios';
 import { URL } from '../ServerURL';
 import { getbalance } from '../store/Actions/AccountBalanceActions';
+import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
+import QRCode from './QRCode';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 const useStyle=makeStyles((theme)=>({
     outer:{
         width:'100%',
@@ -87,7 +90,7 @@ const useStyle=makeStyles((theme)=>({
         color:'rgb(253, 68, 56)'
     },
     pay:{
-        width:'300px',
+        width:'fit-content',
         display:'flex',
         justifyContent:'center',
         alignItems:'center',
@@ -111,6 +114,15 @@ const useStyle=makeStyles((theme)=>({
         justifyContent:'center',
         alignItems:'center',
         flexDirection:'column'
+    },
+    transaction:{
+        display:'none',
+        justifyContent:'center',
+        alignItems:'center',
+        flexDirection:'column',
+        [theme.breakpoints.down("sm")]:{
+            display:'flex'
+        }
     },
     detail:{
         background:'white',
@@ -137,18 +149,11 @@ const Balance = ({setTransact,setTransactions,transactions}) => {
         },5000)
     }
     const {balances,loading,error}=useSelector(state=>state.accountBalance);
-    const dispatch=useDispatch();
-
-    useEffect(()=>{
-        if(!balances){
-            dispatch(getbalance());
-        }
-    },[userInfo])
-
     const [open,setOpen]=useState(false);
+    const [qrOpen,setQrOpen]=useState(false);
   return (
     <Box className={classes.outer}>
-        <Box className={classes.btn} onClick={()=>setTransact(true)}>View Transactions</Box>
+        {/* <Box className={classes.btn} onClick={()=>setTransact(true)}>View Transactions</Box> */}
         <Box className={classes.center}>
             <Box sx={{
                 display:'flex',
@@ -158,8 +163,12 @@ const Balance = ({setTransact,setTransactions,transactions}) => {
                 <Box sx={{fontSize:'30px',fontWeight:'800'}}>IPBS Account</Box>
                 <Box className={classes.detail}>Account Holder : {userInfo?.firstName} {userInfo?.lastName}</Box>
                 <Box className={classes.detail}>Email : {userInfo?.email}</Box>
-                <Box className={classes.detail} sx={{display:'flex',placeContent:'center',gap:'10px'}}>Account Number : {userInfo?.accountNo?.substr(0,5)}******{userInfo?.accountNo?.substr(userInfo?.accountNo?.length-5,userInfo?.accountNo?.length)}  {copy===false?<ContentCopyIcon onClick={copyhandler} sx={{width:'20px',cursor:'pointer'}}/>:<DoneIcon sx={{color:'green'}}/>}</Box>
+                <Box className={classes.detail} sx={{display:'flex',gap:'10px'}}>Account Number : {userInfo?.accountNo?.substr(0,5)}******{userInfo?.accountNo?.substr(userInfo?.accountNo?.length-5,userInfo?.accountNo?.length)}  {copy===false?<ContentCopyIcon onClick={copyhandler} sx={{width:'20px',cursor:'pointer'}}/>:<DoneIcon sx={{color:'green'}}/>}</Box>
                 <Box className={classes.pay}>
+                    <Box className={classes.wrap} onClick={()=>setQrOpen(true)}>
+                        <Box className={classes.item}><QrCodeScannerIcon/></Box>
+                        <Box>QRCode</Box>
+                    </Box>
                     <Box className={classes.wrap} onClick={()=>setOpen(true)}>
                         <Box  className={classes.item}><DownloadingIcon/></Box>
                         <Box>Deposit</Box>
@@ -167,6 +176,10 @@ const Balance = ({setTransact,setTransactions,transactions}) => {
                     <Box className={classes.wrap}>
                         <Box className={classes.item}><CurrencyExchangeIcon/></Box>
                         <Box>Pay</Box>
+                    </Box>
+                    <Box className={classes.transaction} onClick={()=>setTransact(true)}>
+                        <Box className={classes.item}><ReceiptLongIcon/></Box>
+                        <Box>Transactions</Box>
                     </Box>
                 </Box>
             </Box>
@@ -190,13 +203,14 @@ const Balance = ({setTransact,setTransactions,transactions}) => {
                              <span style={{
                                 fontSize:'30px',
                                 fontWeight:'bold'
-                            }}>{curr?.balance}</span></Box>
+                            }}>{Math.floor(curr?.balance)}</span></Box>
                         </Box>
                     )
                 })}
             </Box>
         </Box>
         <Deposit open={open} setOpen={setOpen} setTransactions={setTransactions} transactions={transactions}/>
+        <QRCode open={qrOpen} setOpen={setQrOpen}/>
     </Box>
   )
 }

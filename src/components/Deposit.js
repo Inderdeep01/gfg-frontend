@@ -13,6 +13,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { GET_ACCOUNT_BALANCE_SUCCESS } from "../store/Constants/AccountBalanceConstant";
 import { NetworkImage } from "../utils/gradientAndImages";
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import { SET_ACCOUNT_TRANSACTIONS } from "../store/Constants/TransactionsConstant";
 const useStyle = makeStyles((theme) => ({
   modal: {
     display: "flex",
@@ -111,7 +112,7 @@ const useStyle = makeStyles((theme) => ({
     color:'rgb(25, 121, 230)',
 },
 }));
-const Deposit = ({ open, setOpen ,setTransactions,transactions}) => {
+const Deposit = ({ open, setOpen}) => {
   useEffect(()=>{
     if(open===false){
       setAmount('');
@@ -135,6 +136,7 @@ const Deposit = ({ open, setOpen ,setTransactions,transactions}) => {
   
   const dispatch=useDispatch();
   const {balances}=useSelector(state=>state.accountBalance);
+  const {transactions}=useSelector(state=>state.accountTransactions);
 
   const handleSubmit=async()=>{
         setError('');
@@ -167,11 +169,14 @@ const Deposit = ({ open, setOpen ,setTransactions,transactions}) => {
                 })
                 setLoading(false);
                 setSuccess(true);
-                console.log(data);
-                setTransactions([
-                  data
-                  ,...transactions
-                ])
+                // console.log(data);
+                dispatch({
+                  type:SET_ACCOUNT_TRANSACTIONS,
+                  payload:[
+                    data
+                    ,...transactions
+                  ]
+                })
                 // setTimeout(()=>{
                 //   setOpen(false);
                 // },5000)

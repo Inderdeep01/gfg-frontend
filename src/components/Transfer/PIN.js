@@ -52,7 +52,6 @@ const PIN = ({token,amount,account,setLoading,setError,setSuccess,setAmountPage,
     const {userInfo}=useSelector(state=>state.userLogin);
     const {balances}=useSelector(state=>state.accountBalance);
     const dispatch=useDispatch();
-    const {socket}=useSelector(state=>state.socket);
     const handleSubmit = async () => {
         setPinPage(false);
         setError('');
@@ -74,8 +73,6 @@ const PIN = ({token,amount,account,setLoading,setError,setSuccess,setAmountPage,
                     recipient:account,
                     cardNumber:card?.cardNumber
                 },config);
-
-                socket.emit("transaction",data);
                 const current=balances?.filter((curr)=>curr.currency===token)[0];
                 const left=balances?.filter((curr)=>curr.currency!==token);
                 const payload=[
