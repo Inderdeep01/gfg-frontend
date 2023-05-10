@@ -1,8 +1,11 @@
+import { Box } from '@mui/material'
 import React from 'react'
 
 const Forex = () => {
   return (
-    <div>Forex</div>
+    <Box>
+      Forex
+    </Box>
   )
 }
 

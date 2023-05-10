@@ -1,5 +1,5 @@
-import { CircularProgress, makeStyles } from '@material-ui/core'
-import { Box, Skeleton } from '@mui/material'
+import { makeStyles } from '@material-ui/core'
+import { Box, IconButton, InputAdornment, Skeleton, TextField } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
@@ -14,12 +14,22 @@ import { getbalance } from '../store/Actions/AccountBalanceActions';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import QRCode from './QRCode';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import toast ,{Toaster} from 'react-hot-toast';
+import './Carousel.css'
+import { ToastHtml } from '../Toast';
+import { Howl } from 'howler';
+import { useNavigate } from 'react-router-dom';
 const useStyle=makeStyles((theme)=>({
     outer:{
         width:'100%',
         height:'100%',
         position:'relative',
-        background:'transparent'
+        background:'transparent',
+        overflowY:'scroll',
+        msOverflowStyle:'none',
+        '&::-webkit-scrollbar':{
+                display:'none'
+        },
         // background:'url(https://img.freepik.com/premium-vector/light-neumorphism-circle-background-three-dimensional-neumorphic-texture-wallpaper-neumorphism-vector-background-neumorphic-ui-ux-interface-design-vector-graphic-eps-10_564974-55.jpg?w=2000)',
     },
     btn:{
@@ -96,7 +106,11 @@ const useStyle=makeStyles((theme)=>({
         alignItems:'center',
         height:'80px',
         // border:'1px solid red',
-        gap:'100px'
+        gap:'100px',
+        [theme.breakpoints.down("xs")]:{
+            width:'100%',
+            gap:'30px'
+        }
     },
     item:{
         color:'white',
@@ -107,7 +121,11 @@ const useStyle=makeStyles((theme)=>({
         width:'50px',
         height:'50px',
         borderRadius:'50%',
-        cursor:'pointer'
+        cursor:'pointer',
+        [theme.breakpoints.down("xs")]:{
+            width:'40px',
+            height:'40px'
+        }
     },
     wrap:{
         display:'flex',
@@ -131,13 +149,18 @@ const useStyle=makeStyles((theme)=>({
         paddingRight:'20px',
         borderRadius:'10px',
         position:'relative',
+        width:'100%',
+        // border:'1px solid red',
+        [theme.breakpoints.down("sm")]:{
+            width:'80%'
+        }
     },
     laoding:{
         cursor:'pointer',
         borderRadius:'20px',
     }
 }))
-const Balance = ({setTransact,setTransactions,transactions}) => {
+const Balance = ({setTransact}) => {
     const [copy,setCopy]=useState(false);
     const classes=useStyle();
     const {userInfo}=useSelector(state=>state.userLogin)
@@ -151,6 +174,9 @@ const Balance = ({setTransact,setTransactions,transactions}) => {
     const {balances,loading,error}=useSelector(state=>state.accountBalance);
     const [open,setOpen]=useState(false);
     const [qrOpen,setQrOpen]=useState(false);
+    const navigate=useNavigate();
+      const {transactions}=useSelector(state=>state.accountTransactions);
+    //   console.log(transactions);
   return (
     <Box className={classes.outer}>
         {/* <Box className={classes.btn} onClick={()=>setTransact(true)}>View Transactions</Box> */}
@@ -158,12 +184,29 @@ const Balance = ({setTransact,setTransactions,transactions}) => {
             <Box sx={{
                 display:'flex',
                 flexDirection:'column',
-                gap:'20px'
+                gap:'20px',
+                alignItems:'center'
             }}>
-                <Box sx={{fontSize:'30px',fontWeight:'800'}}>IPBS Account</Box>
-                <Box className={classes.detail}>Account Holder : {userInfo?.firstName} {userInfo?.lastName}</Box>
-                <Box className={classes.detail}>Email : {userInfo?.email}</Box>
-                <Box className={classes.detail} sx={{display:'flex',gap:'10px'}}>Account Number : {userInfo?.accountNo?.substr(0,5)}******{userInfo?.accountNo?.substr(userInfo?.accountNo?.length-5,userInfo?.accountNo?.length)}  {copy===false?<ContentCopyIcon onClick={copyhandler} sx={{width:'20px',cursor:'pointer'}}/>:<DoneIcon sx={{color:'green'}}/>}</Box>
+                <Box sx={{fontSize:'30px',fontWeight:'800'}}>Interplanetary Bank</Box>
+                <TextField sx={{width:'100%'}} id="outlined-basic" label="Account Holder" variant="outlined" value={`${userInfo?.firstName} ${userInfo?.lastName?userInfo?.lastName:''}`}/>
+                {/* <Box className={classes.detail}>Account Holder : {userInfo?.firstName} {userInfo?.lastName}</Box> */}
+                {/* <Box className={classes.detail}>Email : {userInfo?.email}</Box> */}
+                <TextField sx={{width:'100%'}} id="outlined-basic" label="Email" variant="outlined" value={`${userInfo?.email}`}/>
+                <TextField sx={{width:'100%'}} id="outlined-basic" label='Account Number' variant="outlined" value={`${userInfo?.accountNo}`}
+                InputProps={{
+                    endAdornment: (
+                        <InputAdornment position="end">
+                            <IconButton
+                            aria-label="toggle password visibility"
+                            edge="end"
+                            >
+                            {!copy?<ContentCopyIcon onClick={copyhandler} sx={{width:'20px',cursor:'pointer'}}/>:<DoneIcon sx={{color:'green'}}/>}
+                            </IconButton>
+                        </InputAdornment>
+                    ),
+                  }}
+                />
+                {/* // <Box className={classes.detail} sx={{display:'flex',gap:'10px'}}>Account Number : {userInfo?.accountNo?.substr(0,5)}******{userInfo?.accountNo?.substr(userInfo?.accountNo?.length-5,userInfo?.accountNo?.length)}  {copy===false?<ContentCopyIcon onClick={copyhandler} sx={{width:'20px',cursor:'pointer'}}/>:<DoneIcon sx={{color:'green'}}/>}</Box> */}
                 <Box className={classes.pay}>
                     <Box className={classes.wrap} onClick={()=>setQrOpen(true)}>
                         <Box className={classes.item}><QrCodeScannerIcon/></Box>
@@ -173,7 +216,7 @@ const Balance = ({setTransact,setTransactions,transactions}) => {
                         <Box  className={classes.item}><DownloadingIcon/></Box>
                         <Box>Deposit</Box>
                     </Box>
-                    <Box className={classes.wrap}>
+                    <Box className={classes.wrap} onClick={()=>navigate('/pay')}>
                         <Box className={classes.item}><CurrencyExchangeIcon/></Box>
                         <Box>Pay</Box>
                     </Box>
@@ -184,12 +227,14 @@ const Balance = ({setTransact,setTransactions,transactions}) => {
                 </Box>
             </Box>
             <Box sx={{
+                width:'100%',
                 display:'flex',
+                flexDirection:'column',
                 gap:'30px'
             }}>
-                
+                <Box sx={{width:'100%',display:'flex',justifyContent:'center',fontSize:'20px',fontWeight:'600'}}>Account Balance</Box>
+                <Box sx={{width:'100%',display:'flex',justifyContent:'center'}}>
                 {loading && <Skeleton variant='rectangular' width={200} height={200} className={classes.laoding}></Skeleton>}
-
                 {balances?.map((curr)=>{
                     return (
                         <Box className={classes.balance} sx={{
@@ -207,9 +252,10 @@ const Balance = ({setTransact,setTransactions,transactions}) => {
                         </Box>
                     )
                 })}
+                </Box>
             </Box>
         </Box>
-        <Deposit open={open} setOpen={setOpen} setTransactions={setTransactions} transactions={transactions}/>
+        <Deposit open={open} setOpen={setOpen}/>
         <QRCode open={qrOpen} setOpen={setQrOpen}/>
     </Box>
   )

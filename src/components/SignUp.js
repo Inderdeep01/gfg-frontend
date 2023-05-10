@@ -7,6 +7,7 @@ import FormControl from '@mui/material/FormControl';
 import joi from 'joi';
 import { signup } from '../store/Actions/userActions';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 const useStyle=makeStyles((theme)=>({
   outer:{
     height:'100%',
@@ -96,7 +97,7 @@ const SignUp = () => {
       dispatch({type:'REMOVE_SIGNUP_ERROR'});
     }
   },[dispatch,error])
-
+  const navigate=useNavigate();
   const signupSchema=joi.object({
     name:joi.string().required().min(3),
     email:joi.string().email({tlds:{allow:false}}).required(),
@@ -117,7 +118,7 @@ const SignUp = () => {
       var arr=name.split(" ");
       var firstName=arr[0];
       var lastName=arr[1];
-      dispatch(signup(firstName,lastName,email.trim(),password));
+      dispatch(signup(firstName,lastName,email.trim(),password,navigate));
     }
   }
   return (

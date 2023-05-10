@@ -5,6 +5,10 @@ import AmountPage from './AmountPage'
 import PIN from './PIN';
 import GppMaybeIcon from '@mui/icons-material/GppMaybe';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { useLocation, useParams } from 'react-router-dom';
+import axios from 'axios';
+import { URL } from '../../ServerURL';
+import { useSelector } from 'react-redux';
 const useStyle=makeStyles((theme)=>({
   modal: {
     display: "flex",
@@ -70,7 +74,7 @@ const useStyle=makeStyles((theme)=>({
     cursor: "pointer",
   }
 }))
-const PayUsingCard = ({open,setOpen,card}) => {
+const PayUsingCard = ({open,setOpen}) => {
   useEffect(()=>{
     if(open===false){
       setLoading(false);
@@ -81,8 +85,10 @@ const PayUsingCard = ({open,setOpen,card}) => {
       setRecipientPage(true);
       setAccount('');
       setAmount('');
+      setTo(null);
     }
   },[open])
+
   const classes=useStyle();
   const handleClose=()=>{
     setOpen(false);
@@ -100,6 +106,51 @@ const PayUsingCard = ({open,setOpen,card}) => {
   const [account,setAccount]=useState('');
   const [amount,setAmount]=useState('');
   const [token,setToken]=useState('INR');
+  const [to,setTo]=useState(null);
+  const {search}=useLocation();
+  const {userInfo}=useSelector(state=>state.userLogin);
+  const [fetch,setFetch]=useState(false);
+  const fetchUser=async(id)=>{
+    const config={
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':`Bearer ${userInfo?.token}`
+      }
+    }
+    setFetch(true);
+    try{
+      const {data}=await axios.post(`${URL}/details`,{id:id},config);
+        setTo(data);
+        setAccount(data?.accountNo);
+        setFetch(false);
+    }catch(error){
+      console.log(error);
+      setFetch(false);
+    }
+  }
+  const [fromQr,setFromQr]=useState(false);
+  var path=useLocation().pathname;
+  path =path.split("/")[1];
+  const {id}=useParams();
+  useEffect(()=>{
+      if(path==='pay' && id){
+        setOpen(true);
+        setRecipientPage(false);
+        setAmountPage(true);
+        fetchUser(id);
+        setFromQr(true);
+      }
+      else if(path==='pay' && !id){
+        setOpen(true);
+        setRecipientPage(true);
+        setAmountPage(true);
+        setFromQr(false);
+      }
+      else{
+        setFromQr(false);
+      }
+  },[path,id])
+  const [transactionId, setTransactionId] = useState('');
   return (
     <div>
       <Modal
@@ -131,11 +182,11 @@ const PayUsingCard = ({open,setOpen,card}) => {
             >
               {
                 recipientPage?
-                  <Recipient account={account} setAccount={setAccount} setRecipientPage={setRecipientPage} setAmountPage={setAmountPage} setOpen={setOpen}/>
+                  <Recipient account={account} setAccount={setAccount} setRecipientPage={setRecipientPage} setAmountPage={setAmountPage} setOpen={setOpen} to={to} setTo={setTo}/>
                 :amountPage?
-                  <AmountPage amount={amount} setAmount={setAmount} account={account} setRecipientPage={setRecipientPage} setAmountPage={setAmountPage} setPINPage={setPINPage} card={card} token={token} setToken={setToken}/>
+                  <AmountPage amount={amount} setAmount={setAmount} account={account} setRecipientPage={setRecipientPage} setAmountPage={setAmountPage} setPINPage={setPINPage} token={token} setToken={setToken} to={to} setTo={setTo} fromQr={fromQr} setOpen={setOpen} fetch={fetch} setTransactionId={setTransactionId}/>
                 :PINPage?
-                  <PIN amount={amount} account={account} token={token} loading={loading} setLoading={setLoading} error={error} setError={setError} success={success} setSuccess={setSuccess} setAmountPage={setAmountPage} setPinPage={setPINPage} card={card} setOpen={setOpen}/>
+                  <PIN amount={amount} account={account} token={token} loading={loading} setLoading={setLoading} error={error} setError={setError} success={success} setSuccess={setSuccess} setAmountPage={setAmountPage} setPinPage={setPINPage} setOpen={setOpen} transactionId={transactionId}/>
                 :
                 loading?
                   <Box sx={{

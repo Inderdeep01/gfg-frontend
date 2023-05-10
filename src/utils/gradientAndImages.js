@@ -21,3 +21,9 @@ const grad=[
     'linear-gradient(to right, #00b4db, #0083b0)',
     'linear-gradient(to top, #f77062 0%, #fe5196 100%)'
 ]
+
+
+export const currencySymbol={
+    'INR':'₹',
+    'USD':'$'
+}

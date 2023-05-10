@@ -7,6 +7,7 @@ import FormControl from '@mui/material/FormControl';
 import joi from 'joi';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../store/Actions/userActions';
+import { useLocation, useNavigate } from 'react-router-dom';
 const useStyle=makeStyles((theme)=>({
   outer:{
     height:'100%',
@@ -53,7 +54,7 @@ const useStyle=makeStyles((theme)=>({
     borderRadius:'30px',
   }
 }))
-const Login = () => {
+const Login = ({setPrevRoute}) => {
   const classes=useStyle();
   const darkTheme = createTheme({
     palette: {
@@ -78,7 +79,14 @@ const Login = () => {
 
   const {loading,userInfo,error}=useSelector(state=>state.userLogin);
   const dispatch=useDispatch();
-
+  const naviagte=useNavigate();
+  const {state}=useLocation();
+  useEffect(()=>{
+    if(state){
+      setPrevRoute(state?.prevRoute);
+    }
+  },[state])
+  
   useEffect(()=>{
     if(error){
       var er=error.split(" ")[0];
@@ -86,6 +94,13 @@ const Login = () => {
         setErr({
           for:er,
           message:error,
+        })
+      }
+      else if(error==='Please verify your email first'){
+        naviagte('/auth/verify',{
+          state:{
+            email:email
+          }
         })
       }
       else{

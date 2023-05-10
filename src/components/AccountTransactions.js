@@ -10,6 +10,8 @@ import { NetworkGradient, NetworkImage } from '../utils/gradientAndImages';
 import InfiniteScroll from 'react-infinite-scroll-component'
 import {EventSourcePolyfill as EventSource} from 'event-source-polyfill'
 import { SET_ACCOUNT_TRANSACTIONS } from '../store/Constants/TransactionsConstant';
+import { useNavigate } from 'react-router-dom';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 
 const useStyle=makeStyles((theme)=>({
     outer:{
@@ -69,11 +71,12 @@ const AccountTransactions = ({setTransact}) => {
     const classes=useStyle();
     const {userInfo}=useSelector(state=>state.userLogin);
     const {balances}=useSelector(state=>state.accountBalance);
-    const [loading,setLoading]=useState(false);
+    const [loading,setLoading]=useState(true);
     const [error,setError]=useState('');
     const [page,setPage]=useState(1);
     const {transactions}=useSelector(state=>state.accountTransactions);
     const dispatch=useDispatch();
+    console.log('Page ',page);
     const fetchTransactions=async()=>{
         try{
             const config={
@@ -83,7 +86,6 @@ const AccountTransactions = ({setTransact}) => {
                 }
             }
             const {data}=await axios.get(`${URL}/getTx?page=${page}`,config);
-            console.log(data);
             setPage(page+1);
             if(data?.length===0){
                 setMore(false);
@@ -99,10 +101,36 @@ const AccountTransactions = ({setTransact}) => {
             setError(e);
         }
     }
-
+    const fetchTX=async()=>{
+        // console.log('Calling Fetch Txs')
+        try{
+            const config={
+                headers:{
+                    "Content-Type":'application/json',
+                    'Authorization':`Bearer ${userInfo.token}`
+                }
+            }
+            const {data}=await axios.get(`${URL}/getTx?page=1`,config);
+            setPage(page+1);
+            setLoading(false);
+            if(data?.length===0){
+                setMore(false);
+            }
+            else{
+                dispatch({type:SET_ACCOUNT_TRANSACTIONS,payload:[...data]});
+            }
+        }
+        catch(err)
+        {
+            var e=err.response && err.response.data.message? err.response.data.message:err.message;
+            // setLoading(false);
+            setError(e);
+        }
+    }
     useEffect(()=>{
-        fetchTransactions();
-    },[])
+        setPage(1);
+        fetchTX();
+    },[userInfo])
     // console.log(transactions);
 
 
@@ -122,6 +150,10 @@ const AccountTransactions = ({setTransact}) => {
     //     }
     // },[])
     const ref=useRef();
+    const navigate=useNavigate();
+    function mini(num){
+        return num?.substr(num?.length-4,num?.length);
+    }
   return (
     <Box className={classes.outer}>
         <Box className={classes.back} onClick={()=>{setTransact(false)}}><ArrowBackIosNewIcon sx={{fontSize:'30px'}}/></Box>
@@ -159,7 +191,7 @@ const AccountTransactions = ({setTransact}) => {
                     },
                 }} id="accountTransactionDiv">
                 <InfiniteScroll
-                    dataLength={transactions?.length}
+                    dataLength={transactions?.length<=20 || !transactions?20:transactions?.length}
                     next={fetchTransactions}
                     // inverse={true}
                     hasMore={more}
@@ -173,8 +205,12 @@ const AccountTransactions = ({setTransact}) => {
                             height:'70px',
                             display:'flex',
                             alignItems:'center',
-                            borderBottom:'1px solid lightgrey'
-                        }}>
+                            borderBottom:'1px solid lightgrey',
+                            cursor:'pointer',
+                            '&:hover':{
+                                background:'#e0e1e7'
+                            }
+                        }} onClick={()=>navigate(`/?transactionDetails=${transaction._id}`)}>
                             <Box className={classes.center} sx={{width:'40%',display:'flex',gap:'10px'}}>
                                 <Box sx={{width:'35%',height:'50px',display:'flex',justifyContent:'center',alignItems:'center'}}>
                                     <Box sx={{
@@ -186,16 +222,24 @@ const AccountTransactions = ({setTransact}) => {
                                         justifyContent:'center',
                                         alignItems:'center'
                                     }}>
-                                        <img src={`${transaction?.from!==null?NetworkImage[transaction?.card?.network]:NetworkImage['IPBS']}`} style={{
-                                            width:transaction?.from===null?'50px':'70%',
-                                            height:transaction?.from===null?'50px':'70%',
+                                        <img src={`${transaction?.type==='card'?NetworkImage[transaction?.card?.network]:NetworkImage['IPBS']}`} style={{
+                                            width:transaction?.type!=='card'?'50px':'70%',
+                                            height:transaction?.type!=='card'?'50px':'70%',
                                             objectFit:'contain'
                                         }} />
                                     </Box>
                                 </Box>
                                 <Box sx={{width:'55%',height:'50px'}}>
-                                    <Box>*{transaction?.from!==null?transaction?.card?.cardNumber.substring(transaction?.card?.cardNumber?.length-4,transaction?.cardNumber?.length):transaction?.to?.accountNo?.substring(transaction?.to?.accountNo?.length-4,transaction?.to?.accountNo?.length)}</Box>
-                                    <Box sx={{fontSize:'13px'}}>{transaction?.from!==null?transaction?.card?.purpose:'IPBS Bank'}</Box>
+                                    <Box>*{
+                                        transaction?.type==='simpleTransfer'?
+                                        `XX ${mini(transaction?.to?.accountNo)}`
+                                        :
+                                        transaction?.type==='Deposit'?
+                                        `XX ${mini(transaction?.to?.accountNo)}`
+                                        :
+                                        ''
+                                        }</Box>
+                                    <Box sx={{fontSize:'13px'}}>{transaction?.type==='card'?transaction?.card?.purpose:'IPBS Bank'}</Box>
                                 </Box>
                             </Box>
                             <Box className={classes.center} sx={{width:'40%'}}>{(transaction?.from?._id===userInfo?._id)?(transaction?.to?.firstName+' '+transaction?.to?.lastName):transaction?.from!==null?(transaction?.from?.firstName+' '+transaction?.from?.lastName):'Money Deposited'}</Box>
@@ -209,6 +253,11 @@ const AccountTransactions = ({setTransact}) => {
                     )
                 })}
                 </InfiniteScroll>
+                {!loading && transactions?.length===0 && <Box sx={{width:'100%',height:'100%',display:'flex',justifyContent:'center',alignItems:'center',flexDirection:'column'}}>
+                    <ReceiptLongIcon sx={{fontSize:'100px',color:'#fdd131'}}/>
+                    <Box sx={{fontSize:'25px',fontWeight:'700'}}>No Transactions Yet</Box>
+                    <Box sx={{width:'85%',textAlign:'center'}}>After your first transaction you will be able to view here</Box>
+                    </Box>}
                 </Box>
             </Box>
         </Box>

@@ -5,6 +5,12 @@ import React, { useState } from 'react'
 import { NetworkImage } from '../../utils/gradientAndImages';
 import KeyboardAltOutlinedIcon from '@mui/icons-material/KeyboardAltOutlined';
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import { useSelector } from 'react-redux';
+import axios from 'axios';
+import { URL } from '../../ServerURL';
+import PersonIcon from '@mui/icons-material/Person';
+import Loading from '../Loading';
+import { useLocation, useNavigate } from 'react-router-dom';
 const useStyle=makeStyles((theme)=>({
     outer:{
         width:'100%',
@@ -44,20 +50,53 @@ const useStyle=makeStyles((theme)=>({
         }
       }
 }))
-const Recipient = ({account,setAccount,setRecipientPage,setAmountPage,setOpen}) => {
-    const handleSubmit=()=>{
-        if(account){
-            setRecipientPage(false);
-            setAmountPage(true);
+const Recipient = ({account,setAccount,setRecipientPage,setAmountPage,setOpen,to,setTo}) => {
+  const [loading,setLoading]=useState(false);
+  const {userInfo}=useSelector(state=>state.userLogin)
+  const [err,setErr]=useState('');
+  const handleSubmit=async()=>{
+    if(account && to){
+          setRecipientPage(false);
+          setAmountPage(true);
+    }
+    else{
+      const config={
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization':`Bearer ${userInfo?.token}`
         }
+      }
+      try{
+        setLoading(true);
+        const {data}=await axios.post(`${URL}/details`,{accountNo:account},config);
+        if(data===null){
+          setErr('Invalid Account Number');
+          setTo(null);
+        }
+        else{
+          setTo(data);
+          setErr('');
+          console.log(data);
+        }
+        setLoading(false);
+      }catch(error){
+        console.log(error);
+        setLoading(false);
+      }
+    }
     }
     const classes=useStyle();
     // console.log(account);
+    const navigate=useNavigate();
+    const page=useLocation().pathname;
   return (
     <Box className={classes.outer}>
         <Box
         className={classes.back}
         onClick={() => {
+          if(page==='/pay'){
+            navigate('/');
+          }
           setOpen(false);
         }}
       >
@@ -94,11 +133,30 @@ const Recipient = ({account,setAccount,setRecipientPage,setAmountPage,setOpen}) 
             id="input-with-icon-textfield"
             label="Enter Bank Account"
             value={account}
-            onChange={(e)=>setAccount(e.target.value)}
+            onChange={(e)=>{setAccount(e.target.value);setTo(null)}}
             InputProps={{
             startAdornment: (
                 <InputAdornment position="start">
                     <KeyboardAltOutlinedIcon color='primary'/>
+                </InputAdornment>
+            ),
+            }}
+            helperText={<span style={{color:'red'}}>{err}</span>}
+            sx={{
+                width:'80%',
+            }}
+            variant="standard"
+        />
+        {to && 
+        <TextField
+            id="input-with-icon-textfield"
+            label="Account Holder"
+            value={to?.firstName+ ' ' + (to?.lastName?to?.lastName:'')}
+            disabled
+            InputProps={{
+            startAdornment: (
+                <InputAdornment position="start">
+                    <PersonIcon color='primary'/>
                 </InputAdornment>
             ),
             }}
@@ -107,6 +165,7 @@ const Recipient = ({account,setAccount,setRecipientPage,setAmountPage,setOpen}) 
             }}
             variant="standard"
         />
+        }
 
         </Box>
         <Box
@@ -124,10 +183,13 @@ const Recipient = ({account,setAccount,setRecipientPage,setAmountPage,setOpen}) 
         <Box className={classes.generate}
         sx={{
             background:account?'#1979e6':'lightgrey',
+            // background:'lightgrey',
             cursor:account?'pointer':'not-allowed'
         }}
          onClick={handleSubmit}>
-          PROCEED
+          {loading?
+          <Loading/>:
+          to?'PROCEED TO PAY':'VERIFY A/C NO.'}
         </Box>
         </Box>
     </Box>

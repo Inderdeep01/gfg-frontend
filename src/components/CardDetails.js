@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DoneIcon from '@mui/icons-material/Done';
-import PayUsingCard from "./PayByCard/PayUsingCard";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { NetworkGradient, NetworkImage } from "../utils/gradientAndImages";
 import CardDelete from "./CardDelete";
@@ -13,9 +12,7 @@ import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import BlockIcon from '@mui/icons-material/Block';
 import WifiProtectedSetupIcon from '@mui/icons-material/WifiProtectedSetup';
 import BlockCard from "./BlockCard";
-import PersonAddRoundedIcon from '@mui/icons-material/PersonAddRounded';
 import ChangePin from "./ChangePin";
-import AddHolder from "./AddHolder";
 const useStyle=makeStyles((theme)=>({
     modal: {
         display: 'flex',
@@ -230,7 +227,6 @@ const CardDetails = ({setTransact,cardId}) => {
 
     const [block,setBlock]=useState(false);
     const [unblock,setUnBlock]=useState(false);
-    const [holder,setHolder]=useState(false);
     const blockUnblockHandler=()=>{
       if(card.isBlocked){
         setUnBlock(true);
@@ -307,7 +303,6 @@ const CardDetails = ({setTransact,cardId}) => {
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
         <MenuItem onClick={()=>{handleClose();setPin(true)}}><VpnKeyIcon sx={{marginRight:'10px'}}/>Change PIN</MenuItem>
-        <MenuItem onClick={()=>{handleClose();setHolder(true)}}><PersonAddRoundedIcon sx={{marginRight:'10px'}}/>Add Holder</MenuItem>
         <MenuItem onClick={handleClose}><WifiProtectedSetupIcon sx={{marginRight:'10px'}}/>Set Limit</MenuItem>
         <MenuItem onClick={()=>{handleClose();blockUnblockHandler()}}><BlockIcon sx={{marginRight:'10px'}}/>{card?.isBlocked?'UnBlock':'Block'} Card</MenuItem>
         <MenuItem onClick={()=>{handleClose();setDel(true)}}><DeleteOutlineIcon sx={{marginRight:'10px'}}/>Delete Card</MenuItem>
@@ -347,23 +342,19 @@ const CardDetails = ({setTransact,cardId}) => {
         {/* <Box className={classes.showBtn}>{show?'Show Details':'Hide Details'}</Box> */}
       </ThemeProvider>
     </Box>
-    <Box className={classes.pay} sx={{
+    {/* <Box className={classes.pay} sx={{
       '&:hover':{
         color:!card?.isBlocked && 'white',
         background: !card?.isBlocked && '#1979e6',
       },
       cursor:card?.isBlocked?'not-allowed':'pointer'
     }}
-    onClick={()=>{if(card.isBlocked===false){setOpen(true)}}}>Pay Using card</Box>
+    onClick={()=>{if(card.isBlocked===false){setOpen(true)}}}>Pay Using card</Box> */}
 
-
-
-    <PayUsingCard open={open} setOpen={setOpen} cardNumber={card?.cardNumber} card={card}/>
     <CardDelete open={del} setOpen={setDel} card={card}/>
     <BlockCard open={block} setOpen={setBlock} card={card} method="block"/>
     <BlockCard open={unblock} setOpen={setUnBlock} card={card} method="unblock"/>
     <ChangePin open={pin} setOpen={setPin} card={card}/>
-    <AddHolder open={holder} setOpen={setHolder} card={card}/>
     </Box>
   );
 };

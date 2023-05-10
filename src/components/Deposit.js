@@ -25,11 +25,11 @@ const useStyle = makeStyles((theme) => ({
     // border: '2px solid #000',
     outline: "0px solid white",
     width: "500px",
-    height: "500px",
+    height: "600px",
     display: "flex",
     flexDirection: "column",
     overflow: "hidden",
-    borderRadius: "20px",
+    borderRadius: "10px",
     boxShadow: theme.shadows[5],
     [theme.breakpoints.down("xs")]: {
       width: "100%",

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Box, LinearProgress } from '@mui/material'
 import { makeStyles } from '@material-ui/core'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 import { logout } from '../store/Actions/userActions'
 import { URL } from '../ServerURL'
@@ -32,6 +32,8 @@ const useStyles=makeStyles((theme)=>({
   }
 }))
 const SplashScreen = ({setFront}) => {
+  var path=useLocation().pathname;
+  const route=path.split("/")[1];
   const classes=useStyles();
   const [progress,setProgress]=useState(0);
   const {userInfo}=useSelector(state=>state.userLogin);
@@ -70,7 +72,16 @@ const SplashScreen = ({setFront}) => {
       setTimeout(()=>{
         setFront(false);
       },1500);
-      navigate('/auth/login');
+      if(route==='pay'){
+        navigate('/auth/login',{
+          state:{
+            prevRoute:path
+          }
+        })
+      }
+      else{
+        navigate('/auth/login');
+      }
     }
   }
 

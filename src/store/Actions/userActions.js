@@ -26,7 +26,7 @@ export const login=(email,password)=>async(dispatch)=>{
 }
 
 
-export const signup=(firstName,lastName,email,password)=>async(dispatch)=>{
+export const signup=(firstName,lastName,email,password,navigate)=>async(dispatch)=>{
     dispatch({type:USER_SIGNUP_REQUEST});
     try{
         const config={
@@ -35,9 +35,14 @@ export const signup=(firstName,lastName,email,password)=>async(dispatch)=>{
             }
         }
         const {data}=await axios.post(`${URL}/signup`,{firstName,lastName,email,password},config);
-        dispatch({type:USER_LOGIN_SUCCESS,payload:data});
-        localStorage.setItem('userInfo',JSON.stringify(data));
+        // dispatch({type:USER_LOGIN_SUCCESS,payload:data});
+        // localStorage.setItem('userInfo',JSON.stringify(data));
         dispatch({type:USER_SIGNUP_SUCCESS});
+        navigate('/auth/verify',{
+            state:{
+                email:email
+            }
+        })
     }catch(error)
     {
         dispatch({

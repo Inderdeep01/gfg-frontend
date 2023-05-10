@@ -7,7 +7,7 @@ import { URL } from '../../ServerURL';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { GET_ACCOUNT_BALANCE_SUCCESS } from '../../store/Constants/AccountBalanceConstant';
-
+import { ADD_ACCOUNT_TRANSACTION, SET_ACCOUNT_TRANSACTIONS } from '../../store/Constants/TransactionsConstant';
 const useStyle=makeStyles((theme)=>({
     textfield:{
         '& fieldset':{
@@ -26,52 +26,80 @@ const useStyle=makeStyles((theme)=>({
       },
       generate:{
         width: "80%",
-    height: "40px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: "10px",
-    background: "#1979e6",
-    // border: "1px solid #1979e6",
-    color: "white",
-    cursor: "pointer",
+        height: "40px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: "10px",
+        background: "#1979e6",
+        // border: "1px solid #1979e6",
+        color: "white",
+        cursor: "pointer",
+      },
+      otp__digit:{
+        height: 40,
+        width: 40,
+        backgroundColor: 'transparent',
+        borderRadius: 4,
+        border: `1px solid lightgrey`,
+        textAlign: 'center',
+        outline: 'none',
+        fontSize: 16,
+        '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
+        '-webkit-appearance': 'none',
+        margin: 0,
+        },
+        /* Firefox */
+        '&[type=number]': {
+        '-moz-appearance': 'textfield',
+        },
+        '&:focus': {
+        borderWidth: 2,
+        borderColor: 'black',
+        fontSize: 20,
+        },
+      },
+      inputDiv:{
+        display:'flex',
+        justifyContent:'center',
+        alignItems:'center',
+        gap:'20px',
+        width:'100%',
+        height:'25%',
+        [theme.breakpoints.down("xs")]:{
+            gap:'15px',
+        }
       }
+
 }))
-const PIN = ({token,amount,account,setLoading,setError,setSuccess,setAmountPage,setPinPage,card,setOpen}) => {
+const PIN = ({token,amount,account,setLoading,setError,setSuccess,setAmountPage,setPinPage,card,setOpen,transactionId}) => {
     const classes=useStyle();
     const [visible,setVisible]=useState(false);
-    const ref1=useRef();
-    const ref2=useRef();
-    const ref3=useRef();
-    const ref4=useRef();
-    const [p1,setP1]=useState('');
-    const [p2,setP2]=useState('');
-    const [p3,setP3]=useState('');
-    const [p4,setP4]=useState('');
 
     const {userInfo}=useSelector(state=>state.userLogin);
     const {balances}=useSelector(state=>state.accountBalance);
+    const {transactions}=useSelector(state=>state.accountTransactions)
     const dispatch=useDispatch();
     const handleSubmit = async () => {
         setPinPage(false);
         setError('');
         setSuccess(false);
         setLoading(true);
-        const pin=p1+p2+p3+p4;
+        var otp_inputs=document.querySelectorAll(".otp_digit");
+        var otp="";
+        otp_inputs.forEach((ele)=>{
+            otp+=ele.value;
+        })
         try{
                 const config={
                     headers:{
                         "Content-Type":'application/json',
-                        'Authorization':`Bearer ${userInfo.token}`
+                        'Authorization':`Bearer ${userInfo?.token}`
                     }
                 }
-                const {data}=await axios.post(`${URL}/transact`,{
-                    type:'card',
-                    amount:amount,
-                    pin:pin,
-                    destinationToken:token,
-                    recipient:account,
-                    cardNumber:card?.cardNumber
+                const {data}=await axios.post(`${URL}/verifyTx`,{
+                    id:transactionId,
+                    otp:otp
                 },config);
                 const current=balances?.filter((curr)=>curr.currency===token)[0];
                 const left=balances?.filter((curr)=>curr.currency!==token);
@@ -86,18 +114,47 @@ const PIN = ({token,amount,account,setLoading,setError,setSuccess,setAmountPage,
                   type:GET_ACCOUNT_BALANCE_SUCCESS,
                   payload:payload
                 })
+                dispatch({
+                    type:ADD_ACCOUNT_TRANSACTION,
+                    payload:data
+                })
                 setLoading(false);
                 setSuccess(true);
             }
             catch(err)
             {
                 var e=err.response && err.response.data.message? err.response.data.message:err.message;
+                console.log(e);
                 setLoading(false);
                 setError(e);
             }
       };
       useEffect(()=>{
-        ref1.current.focus();
+        // ref1.current.focus();
+      },[])
+      useEffect(()=>{
+        var otp_inputs=document.querySelectorAll(".otp_digit")
+        // console.log(otp_inputs);
+        otp_inputs.forEach((_)=>{
+        _.addEventListener("keyup", handle_next_input)
+        })
+        function handle_next_input(event){
+            var mykey = "0123456789".split("")
+            let current = event.target
+            let index = parseInt(current.classList[2].split("__")[2])
+            current.value = event.key
+            if(event.keyCode == 8 && index > 1){
+                current.previousElementSibling.focus()
+            }
+            if(index < 6 && mykey.indexOf(""+event.key+"") != -1){
+                var next = current.nextElementSibling;
+                next.focus()
+            }
+            var _finalKey = ""
+            for(let {value} of otp_inputs){
+                _finalKey += value
+            }
+        }
       },[])
   return (
     <Box sx={{
@@ -130,55 +187,15 @@ const PIN = ({token,amount,account,setLoading,setError,setSuccess,setAmountPage,
             fontSize:'30px',
             fontWeight:'bold',
             marginTop:'30px'
-        }}>Enter PIN</Box>
-
-        <Box sx={{
-            display:'flex',
-            justifyContent:'center',
-            alignItems:'center',
-            gap:'30px',
-            width:'100%',
-            height:'25%',
-        }}>
-            <TextField inputRef={ref1} type={visible?'text':'password'} variant='outlined' value={p1} sx={{width:'50px'}} InputProps={{style:{fontSize:'20px',paddingLeft:'5px'}}} onChange={(e)=>{
-                if(e.target.value?.length<=1){
-                    setP1(e.target.value);
-                }
-                if(e.target.value!=''){
-                    ref2.current.focus();
-                }
-            }}/>
-            <TextField inputRef={ref2} type={visible?'text':'password'} variant='outlined' value={p2} sx={{width:'50px'}} InputProps={{style:{fontSize:'20px',paddingLeft:'5px'}}} onChange={(e)=>{
-                if(e.target.value?.length<=1){
-                    setP2(e.target.value);
-                }
-                if(e.target.value!=''){
-                    ref3.current.focus();
-                }
-                else if(e.target.value===''){
-                    ref1.current.focus();
-                }
-            }}/>
-            <TextField inputRef={ref3} type={visible?'text':'password'} variant='outlined' value={p3} sx={{width:'50px'}} InputProps={{style:{fontSize:'20px',paddingLeft:'5px'}}} onChange={(e)=>{
-                if(e.target.value?.length<=1){
-                    setP3(e.target.value);
-                }
-                if(e.target.value!=''){
-                    ref4.current.focus();
-                }
-                else if(e.target.value===''){
-                    ref2.current.focus();
-                }
-            }}/>
-            <TextField inputRef={ref4} type={visible?'text':'password'} variant='outlined' value={p4} sx={{width:'50px'}} InputProps={{style:{fontSize:'20px',paddingLeft:'5px'}}} onChange={(e)=>{
-                if(e.target.value?.length<=1){
-                    setP4(e.target.value);
-                }
-                if(e.target.value===''){
-                    ref3.current.focus();
-                    // ref3.current.setSelectionRange(selectionStart, selectionEnd)
-                }
-            }}/>
+        }}>Enter OTP</Box>
+        <Box>OTP has been sent to {userInfo?.email}</Box>
+        <Box className={classes.inputDiv}>
+            <input type={visible?"number":'password'} className={`${classes.otp__digit} otp_digit otp__field__1`}/>
+            <input type={visible?"number":'password'} className={`${classes.otp__digit} otp_digit otp__field__2`}/>
+            <input type={visible?"number":'password'} className={`${classes.otp__digit} otp_digit otp__field__3`}/>
+            <input type={visible?"number":'password'} className={`${classes.otp__digit} otp_digit otp__field__4`}/>
+            <input type={visible?"number":'password'} className={`${classes.otp__digit} otp_digit otp__field__5`}/>
+            <input type={visible?"number":'password'} className={`${classes.otp__digit} otp_digit otp__field__6`}/>
         </Box>
 
         <Box sx={{color:'#2781e8',display:'flex',alignItems:'center',gap:'10px',fontSize:'20px',fontWeight:'500',position:'relative',cursor:'pointer'}} onClick={()=>{setVisible(!visible)}}>{visible?<VisibilityOff/>:<Visibility/>}{visible?'HIDE':'SHOW'}</Box>

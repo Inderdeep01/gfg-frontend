@@ -5,6 +5,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import Carousel from '../components/Carousel';
 import SignUp from '../components/SignUp';
 import Login from '../components/Login';
+import Verify from '../components/Verify';
 
 const useStyle=makeStyles((theme)=>({
     root:{
@@ -137,12 +138,12 @@ const useStyle=makeStyles((theme)=>({
     }
 }))
 
-const Auth = ({activeIndex,setActiveIndex}) => {
+const Auth = ({activeIndex,setActiveIndex,setPrevRoute}) => {
     const classes=useStyle();
     const {method}=useParams();
     const navigate=useNavigate();
     useEffect(()=>{
-      if(method!=='login' && method!=='signup'){
+      if(method!=='login' && method!=='signup' && method!=='verify'){
         navigate('/auth/login');
       }
     },[method,navigate])
@@ -153,12 +154,15 @@ const Auth = ({activeIndex,setActiveIndex}) => {
           <Carousel activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
         </Box>
         <Box className={classes.auth}>
+          {method!=='verify' && 
           <Box className={classes.upperdiv}>
             <Box className={classes.wrapbtn}>
               <Link to='/auth/login' className={`${method==='login'?classes.active:classes.btn}`}>Login</Link>
               <Link to='/auth/signup' className={`${method==='signup'?classes.active:classes.btn}`}>Sign Up</Link>  
             </Box>
           </Box>
+          }
+          {method!=='verify' &&
           <Box className={classes.heading}>
             <Box className={classes.inheading}>
               <Box className={`${method==='login' && classes.activehead}`} sx={{cursor:'pointer'}} onClick={()=>{navigate('/auth/login')}}>Login</Box>
@@ -173,11 +177,12 @@ const Auth = ({activeIndex,setActiveIndex}) => {
             }}
              className={classes.borderBt}></Box>
           </Box>
+          }
           <Box style={{
             width:'100%',
             height:'100%',
           }}>
-            {method==='login'?<Login/>:<SignUp/>}
+            {method==='login'?<Login setPrevRoute={setPrevRoute}/>:method==='signup'?<SignUp/>:<Verify/>}
           </Box>
         </Box>
       </Box>

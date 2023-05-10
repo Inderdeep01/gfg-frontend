@@ -1,7 +1,7 @@
 import { makeStyles } from '@material-ui/core';
 import { Box } from '@mui/material'
-import React, { useEffect, useState } from 'react'
-import {useLocation, useParams } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react'
+import {useLocation, useNavigate, useParams } from 'react-router-dom';
 // import Transfer from '../pages/Transfer';
 import Forex from '../pages/Forex';
 import DashBoard from '../pages/DashBoard';
@@ -15,7 +15,9 @@ import { getbalance } from '../store/Actions/AccountBalanceActions';
 import io from 'socket.io-client';
 import { URL } from '../ServerURL';
 import { ADD_ACCOUNT_TRANSACTION, SET_SOCKET } from '../store/Constants/TransactionsConstant';
-
+import toast from 'react-hot-toast';
+import { ToastHtml } from '../Toast';
+import {Howl} from 'howler'
 const useStyle=makeStyles((theme)=>({
     outer:{
         width:'80%',
@@ -51,11 +53,26 @@ const Body = () => {
     useEffect(()=>{
       dispatch({type:SET_SOCKET,payload:io(URL)});
     },[])
+
+    const ref=useRef();
+    const navigate=useNavigate()
+    const notify=(tx)=>{
+      // ref.current.click();
+      const soundEffect = new Howl({
+        src: ['/sound/toast.mp3'], // Path to your sound effect file
+      });
+      toast.custom((t) => (
+          ToastHtml(t,tx,navigate)
+      ),{
+        onOpen: ()=>soundEffect.play()
+      })
+    }
     useEffect(()=>{
-      if(socket){
+      if(socket && userInfo){
         socket.emit("setup",userInfo?.token);
         socket.on("connected",()=>console.log('Connected to websocket'));
-        socket.on("newTransactionRecieved",(tx)=>{
+        socket.on("newTx",(tx)=>{
+          notify(tx);
           dispatch({type:ADD_ACCOUNT_TRANSACTION,payload:tx});
         })
       }
@@ -63,7 +80,8 @@ const Body = () => {
     console.log(transactions);
     return (
       <Box className={classes.outer}>
-        {page===undefined?<DashBoard/>:page==='forex'?<Forex/>:page==='settings'?<Settings/>:page==='card' && no!==undefined?<CardSelected cardId={no}/>:<Error/>}
+        <button ref={ref} style={{display:'none'}}></button>
+        {page===undefined || page==='pay'?<DashBoard/>:page==='forex'?<Forex/>:page==='settings'?<Settings/>:page==='card' && no!==undefined?<CardSelected cardId={no}/>:<Error/>}
       </Box>
     )
 }

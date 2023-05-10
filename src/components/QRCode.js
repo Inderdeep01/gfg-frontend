@@ -79,7 +79,7 @@ const QRCode = ({ open, setOpen}) => {
                 <QRLine 
                 styles={{svg:{width:'350px',height:'350px'}}}
                 lineWidth={50}
-                value={`https://interplanetarybank.org/`}
+                value={`https://interplanetarybank.org/pay/${userInfo?._id}`}
                 posType="roundRect"
                 level="M"
                 direction="h-v"

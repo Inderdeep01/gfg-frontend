@@ -3,6 +3,7 @@ import { Box } from '@mui/material';
 import React, { useState } from 'react'
 import Balance from '../components/Balance';
 import AccountTransactions from '../components/AccountTransactions';
+import TransactionReciept from '../components/TransactionReciept';
 
 const useStyle=makeStyles((theme)=>({
     outer:{
@@ -43,6 +44,7 @@ const DashBoard = () => {
       <Box className={classes.transaction} sx={{zIndex:transact?1:0,}}>
         <AccountTransactions setTransact={setTransact} transactions={transactions} setTransactions={setTransactions}/>
       </Box>
+      <TransactionReciept/>
     </Box>
   )
 }

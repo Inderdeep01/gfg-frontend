@@ -19,6 +19,8 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { GET_ACCOUNT_BALANCE_SUCCESS } from "../../store/Constants/AccountBalanceConstant";
 import { NetworkImage } from "../../utils/gradientAndImages";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import { useNavigate } from "react-router-dom";
+import Loading from "../Loading";
 const useStyle = makeStyles((theme) => ({
   cancel: {
     width: "115px",
@@ -90,7 +92,7 @@ const useStyle = makeStyles((theme) => ({
     color: "rgb(25, 121, 230)",
   },
 }));
-const PayUsingCard = ({amount,setAmount,account,setAmountPage,setPINPage,setRecipientPage,card,token,setToken}) => {
+const PayUsingCard = ({amount,setAmount,account,setAmountPage,setPINPage,setRecipientPage,token,setToken,to,setTo,fromQr,setOpen,fetch,setTransactionId}) => {
   const handleChange = (event) => {
     setToken(event.target.value);
   };
@@ -171,7 +173,34 @@ const PayUsingCard = ({amount,setAmount,account,setAmountPage,setPINPage,setReci
 	 var result = translate(n) 
 	return result.trim()+' Only'
 }
-
+const [loading,setLoading]=useState(false);
+const navigate=useNavigate();
+  const handleSubmit=async()=>{
+    setLoading(true);
+    setTransactionId('');
+    try{
+      const config={
+        headers:{
+            "Content-Type":'application/json',
+            'Authorization':`Bearer ${userInfo.token}`
+        }
+    }
+      const {data}=await axios.post(`${URL}/transact`,{
+          type:'simpleTransfer',
+          amount:amount,
+          destinationToken:token,
+          recipient:account,
+      },config);
+      //id,
+      setTransactionId(data.id);
+      setLoading(false);
+      setAmountPage(false);
+      setPINPage(true);
+    }catch(error){
+      console.log(error);
+      setLoading(false);
+    }
+  }
   return (
     <Box
       sx={{
@@ -188,8 +217,13 @@ const PayUsingCard = ({amount,setAmount,account,setAmountPage,setPINPage,setReci
       <Box
         className={classes.back}
         onClick={() => {
-          setPINPage(false);
-          setRecipientPage(true);
+          if(fromQr){
+            setOpen(false);
+            navigate('/');
+          }else{
+            setPINPage(false);
+            setRecipientPage(true);
+          }
         }}
       >
         <ArrowBackIosNewIcon sx={{ fontSize: "30px" }} />
@@ -219,6 +253,7 @@ const PayUsingCard = ({amount,setAmount,account,setAmountPage,setPINPage,setReci
             account?.length
           )}
         </Box>
+        <Box sx={{fontSize:'20px',fontWeight:'500'}}>{to?.firstName} {to?.lastName?to?.lastName:''}</Box>
       </Box>
       <Box
         sx={{
@@ -371,15 +406,18 @@ const PayUsingCard = ({amount,setAmount,account,setAmountPage,setPINPage,setReci
           </Box>
           <Box className={classes.generate}
           sx={{
-            background:amount?'#1979e6':'lightgrey',
+            background:fetch?'#1979e6':amount?'#1979e6':'lightgrey',
             cursor:amount?'pointer':'not-allowed'
           }}
           onClick={()=>{
-            if(amount){
-              setAmountPage(false);
-              setPINPage(true);
+            if(amount && to!==null){
+              handleSubmit();
             }
-          }}>PAY</Box>
+          }}>
+            {loading || fetch?
+            <Loading/>:
+            to===null?<span style={{color:'red'}}>Invalid User</span>:'PAY'}
+            </Box>
         </Box>
         {/* <Box className={classes.cancel} onClick={()=>{setOpen(false)}}>CANCEL</Box> */}
       </Box>
