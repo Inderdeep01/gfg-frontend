@@ -11,7 +11,6 @@ const useStyle=makeStyles((theme)=>({
         height:'100%',
         display:'flex',
         position:'relative',
-        background:'#f2f3f7',
     },
     front:{
       width:'60%',

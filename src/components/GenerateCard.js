@@ -219,7 +219,7 @@ const GenerateCard = ({open,setOpen}) => {
                         }}>
                             {['IPBS','Mastercard','VISA','RuPay','Amex'].map((network)=>{
                                 return (
-                                    <img className={value===network?classes.imgSelected:classes.img} src={`/img/${network}.png`} onClick={()=>setValue(network)}/>
+                                    <img key={network} className={value===network?classes.imgSelected:classes.img} src={`/img/${network}.png`} onClick={()=>setValue(network)}/>
                                 )
                             })}
                         </Box>

@@ -2,12 +2,13 @@ import { makeStyles } from '@material-ui/core';
 import { Box, TextField } from '@mui/material'
 import React, { useEffect, useRef, useState } from 'react'
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { URL } from '../../ServerURL';
+import { SettingsOverscanSharp, Visibility, VisibilityOff } from '@mui/icons-material';
+import { URL } from '../ServerURL';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { GET_ACCOUNT_BALANCE_SUCCESS } from '../../store/Constants/AccountBalanceConstant';
-import { ADD_ACCOUNT_TRANSACTION, SET_ACCOUNT_TRANSACTIONS } from '../../store/Constants/TransactionsConstant';
+import getSymbolFromCurrency from 'currency-symbol-map';
+import { ADD_ACCOUNT_TRANSACTION } from '../store/Constants/TransactionsConstant';
+import { GET_ACCOUNT_BALANCE_SUCCESS } from '../store/Constants/AccountBalanceConstant';
 const useStyle=makeStyles((theme)=>({
     textfield:{
         '& fieldset':{
@@ -38,7 +39,7 @@ const useStyle=makeStyles((theme)=>({
       },
       otp__digit:{
         height: 40,
-        width: 40,
+        width: 25,
         backgroundColor: 'transparent',
         borderRadius: 4,
         border: `1px solid lightgrey`,
@@ -63,30 +64,30 @@ const useStyle=makeStyles((theme)=>({
         display:'flex',
         justifyContent:'center',
         alignItems:'center',
-        gap:'20px',
-        width:'100%',
+        gap:'10px',
+        width:'80%',
         height:'25%',
+        // border:'1px solid red',
         [theme.breakpoints.down("xs")]:{
-            gap:'15px',
+            gap:'10px',
         }
       }
 
 }))
-const PIN = ({token,amount,account,setLoading,setError,setSuccess,setAmountPage,setPinPage,card,setOpen,transactionId}) => {
+const ForexOTP = ({token,amount,account,setLoading,setError,setSuccess,txObj,setExchangePage,setOtp,tid}) => {
     const classes=useStyle();
     const [visible,setVisible]=useState(false);
-
     const {userInfo}=useSelector(state=>state.userLogin);
     const {balances}=useSelector(state=>state.accountBalance);
     const {transactions}=useSelector(state=>state.accountTransactions)
     const dispatch=useDispatch();
     const {socket}=useSelector(state=>state.socket);
     const handleSubmit = async () => {
-        setPinPage(false);
         setError('');
+        setOtp(false);
         setSuccess(false);
         setLoading(true);
-        var otp_inputs=document.querySelectorAll(".otp_digit");
+        var otp_inputs=document.querySelectorAll(".otp_digit1");
         var otp="";
         otp_inputs.forEach((ele)=>{
             otp+=ele.value;
@@ -99,46 +100,37 @@ const PIN = ({token,amount,account,setLoading,setError,setSuccess,setAmountPage,
                     }
                 }
                 const {data}=await axios.post(`${URL}/verifyTx`,{
-                    id:transactionId,
+                    id:tid,
                     otp:otp
                 },config);
-
                 await socket.emit("transaction",data);
-
-                const current=balances?.filter((curr)=>curr.currency===token)[0];
-                const left=balances?.filter((curr)=>curr.currency!==token);
+                const currencyFrom=balances?.filter((curr)=>curr?.currency===data?.currency)[0];
+                const left=balances?.filter((curr)=> curr?.currency!==data?.currency);
                 const payload=[
                   {
-                    currency:token,
-                    balance:current.balance-JSON.parse(amount),
+                    currency:currencyFrom.currency,
+                    balance: JSON.stringify(JSON.parse(currencyFrom.balance)-JSON.parse(data.amount)),
                   },
                   ...left,
                 ]
-                dispatch({
-                  type:GET_ACCOUNT_BALANCE_SUCCESS,
-                  payload:payload
-                })
-                dispatch({
-                    type:ADD_ACCOUNT_TRANSACTION,
-                    payload:data
-                })
-
+                dispatch({type:GET_ACCOUNT_BALANCE_SUCCESS,payload:payload});
+                dispatch({type:ADD_ACCOUNT_TRANSACTION,payload:data})
                 setLoading(false);
                 setSuccess(true);
             }
             catch(err)
             {
                 var e=err.response && err.response.data.message? err.response.data.message:err.message;
-                console.log(e);
+                // console.log(e);
                 setLoading(false);
                 setError(e);
             }
-      };
+    };
       useEffect(()=>{
         // ref1.current.focus();
       },[])
       useEffect(()=>{
-        var otp_inputs=document.querySelectorAll(".otp_digit")
+        var otp_inputs=document.querySelectorAll(".otp_digit1")
         // console.log(otp_inputs);
         otp_inputs.forEach((_)=>{
         _.addEventListener("keyup", handle_next_input)
@@ -172,8 +164,8 @@ const PIN = ({token,amount,account,setLoading,setError,setSuccess,setAmountPage,
         <Box
         className={classes.back}
         onClick={() => {
-            setPinPage(false);
-          setAmountPage(true);
+            setOtp(false);
+            setExchangePage(true);
         }}
       >
         <ArrowBackIosNewIcon sx={{ fontSize: "30px" }} />
@@ -187,7 +179,7 @@ const PIN = ({token,amount,account,setLoading,setError,setSuccess,setAmountPage,
             display:'flex',
             justifyContent:'center',
             alignItems:'center'
-        }}>Sending {token==='INR'?'₹':'$'} {amount}  to XX{account?.substr(account?.length-4,account?.length)}</Box>
+        }}>Sending {getSymbolFromCurrency(txObj?.sourceToken)} {txObj?.amountFrom} {'=>'} {getSymbolFromCurrency(txObj?.destinationToken)} {txObj?.amountTo} to XX{account?.substr(account?.length-4,account?.length)}</Box>
         <Box sx={{
             fontSize:'30px',
             fontWeight:'bold',
@@ -195,12 +187,12 @@ const PIN = ({token,amount,account,setLoading,setError,setSuccess,setAmountPage,
         }}>Enter OTP</Box>
         <Box>OTP has been sent to {userInfo?.email}</Box>
         <Box className={classes.inputDiv}>
-            <input type='number' className={`${classes.otp__digit} otp_digit otp__field__1`}/>
-            <input type='number' className={`${classes.otp__digit} otp_digit otp__field__2`}/>
-            <input type='number' className={`${classes.otp__digit} otp_digit otp__field__3`}/>
-            <input type='number' className={`${classes.otp__digit} otp_digit otp__field__4`}/>
-            <input type='number' className={`${classes.otp__digit} otp_digit otp__field__5`}/>
-            <input type='number' className={`${classes.otp__digit} otp_digit otp__field__6`}/>
+            <input type='number' className={`${classes.otp__digit} otp_digit1 otp__field__1`}/>
+            <input type='number' className={`${classes.otp__digit} otp_digit1 otp__field__2`}/>
+            <input type='number' className={`${classes.otp__digit} otp_digit1 otp__field__3`}/>
+            <input type='number' className={`${classes.otp__digit} otp_digit1 otp__field__4`}/>
+            <input type='number' className={`${classes.otp__digit} otp_digit1 otp__field__5`}/>
+            <input type='number' className={`${classes.otp__digit} otp_digit1 otp__field__6`}/>
         </Box>
         <Box className={classes.generate} onClick={handleSubmit} sx={{
             position:'absolute',
@@ -210,4 +202,4 @@ const PIN = ({token,amount,account,setLoading,setError,setSuccess,setAmountPage,
   )
 }
 
-export default PIN
+export default ForexOTP

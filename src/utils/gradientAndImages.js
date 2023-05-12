@@ -23,7 +23,12 @@ const grad=[
 ]
 
 
-export const currencySymbol={
-    'INR':'₹',
-    'USD':'$'
-}
+export const currencies=[
+    'INR',
+    'USD',
+    'CAD',
+    'EUR',
+    'AED',
+    'JPY',
+    'RUB'
+]

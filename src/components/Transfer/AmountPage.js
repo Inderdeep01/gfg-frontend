@@ -21,6 +21,8 @@ import { NetworkImage } from "../../utils/gradientAndImages";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { useNavigate } from "react-router-dom";
 import Loading from "../Loading";
+import { inWords } from "../TransactionReciept";
+import getSymbolFromCurrency from "currency-symbol-map";
 const useStyle = makeStyles((theme) => ({
   cancel: {
     width: "115px",
@@ -101,78 +103,6 @@ const PayUsingCard = ({amount,setAmount,account,setAmountPage,setPINPage,setReci
   const dispatch = useDispatch();
   const { balances } = useSelector((state) => state.accountBalance);
   const classes = useStyle();
-
-  var a = [
-    "",
-    "One ",
-    "Two ",
-    "Three ",
-    "Four ",
-    "Five ",
-    "Six ",
-    "Seven ",
-    "Eight ",
-    "Nine ",
-    "Ten ",
-    "Eleven ",
-    "Twelve ",
-    "Thirteen ",
-    "Fourteen ",
-    "Fifteen ",
-    "Sixteen ",
-    "Seventeen ",
-    "Eighteen ",
-    "Nineteen ",
-  ];
-  var b = [
-    "",
-    "",
-    "twenty",
-    "Thirty",
-    "Forty",
-    "Fifty",
-    "Sixty",
-    "Seventy",
-    "Eighty",
-    "Ninety",
-  ];
-
-  function inWords (n) {
-    if (n < 0)
-      return false;
-	 var single_digit = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine']
-	 var double_digit = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen']
-	 var below_hundred = ['Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety']
-	if (n === 0) return 'Zero'
-	function translate(n) {
-		var word = ""
-		if (n < 10) {
-			word = single_digit[n] + ' '
-		}
-		else if (n < 20) {
-			word = double_digit[n - 10] + ' '
-		}
-		else if (n < 100) {
-			var rem = translate(n % 10)
-			word = below_hundred[(n - n % 10) / 10 - 2] + ' ' + rem
-		}
-		else if (n < 1000) {
-			word = single_digit[Math.trunc(n / 100)] + ' Hundred ' + translate(n % 100)
-		}
-		else if (n < 100000) {
-			word = translate(parseInt(n / 1000)).trim() + ' Thousand ' + translate(n % 1000)
-		}
-		else if (n < 10000000) {
-			word = translate(parseInt(n / 100000)).trim() + ' Lakh ' + translate(n % 100000)
-		}
-		else {
-			word = translate(parseInt(n / 10000000)).trim() + ' Crore ' + translate(n % 10000000)
-		}
-		return word
-	}
-	 var result = translate(n) 
-	return result.trim()+' Only'
-}
 const [loading,setLoading]=useState(false);
 const navigate=useNavigate();
   const handleSubmit=async()=>{
@@ -201,6 +131,18 @@ const navigate=useNavigate();
       setLoading(false);
     }
   }
+  const [noFunds, setnoFunds] = useState(false);
+  useEffect(()=>{
+    if(amount){
+      const res=balances.filter(ele=>ele.currency===token)[0];
+      if(JSON.parse(amount)>JSON.parse(res.balance)){
+        setnoFunds(true);
+      }
+      else{
+        setnoFunds(false);
+      }
+    }
+  },[amount,token])
   return (
     <Box
       sx={{
@@ -296,18 +238,16 @@ const navigate=useNavigate();
                   transform: "translateY(-10px)",
                 }}
               >
-                <MenuItem
-                  value={"INR"}
-                  sx={{ textAlign: "center", fontSize: "30px" }}
-                >
-                  ₹
-                </MenuItem>
-                <MenuItem
-                  value={"USD"}
-                  sx={{ textAlign: "center", fontSize: "30px" }}
-                >
-                  $
-                </MenuItem>
+                {balances?.map((curr)=>{
+                  return (
+                    <MenuItem
+                      value={curr?.currency}
+                      sx={{ textAlign: "center", fontSize: "30px" }}
+                    >
+                      {getSymbolFromCurrency(curr?.currency)}
+                    </MenuItem>
+                  )
+                })}
               </Select>
             </FormControl>
             <TextField
@@ -355,7 +295,7 @@ const navigate=useNavigate();
               visibility: amount ? "visible" : "hidden",
             }}
           >
-            {token === "INR" ? "Rupees" : "USD"} {inWords(amount)}
+            {amount && inWords(amount,token)}
           </Box>
         </Box>
       </Box>
@@ -406,17 +346,17 @@ const navigate=useNavigate();
           </Box>
           <Box className={classes.generate}
           sx={{
-            background:fetch?'#1979e6':amount?'#1979e6':'lightgrey',
+            background:fetch?'#1979e6':noFunds?'lightgrey':amount?'#1979e6':'lightgrey',
             cursor:amount?'pointer':'not-allowed'
           }}
           onClick={()=>{
-            if(amount && to!==null){
+            if(amount && to!==null && !noFunds){
               handleSubmit();
             }
           }}>
             {loading || fetch?
             <Loading/>:
-            to===null?<span style={{color:'red'}}>Invalid User</span>:'PAY'}
+            to===null?<span style={{color:'red'}}>Invalid User</span>:noFunds?<span style={{color:'red'}}>Insufficent Funds</span>:'PAY'}
             </Box>
         </Box>
         {/* <Box className={classes.cancel} onClick={()=>{setOpen(false)}}>CANCEL</Box> */}

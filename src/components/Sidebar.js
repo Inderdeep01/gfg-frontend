@@ -15,6 +15,7 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import { getCards } from '../store/Actions/cardActions';
 import PayUsingCard from './Transfer/PayUsingCard';
+import Forex from '../pages/Forex';
 
 const useStyle=makeStyles((theme)=>({
     outer:{
@@ -176,6 +177,7 @@ const Sidebar = ({side,setSide}) => {
             document.removeEventListener("mousedown", handleOusideClick);
         };
     },[ref])
+    const [forex,setForexOpen]=useState(false);
   return (
     <Box className={`${classes.outer} clickbox`} sx={{left:side?'0px':'-400px'}} ref={ref}>
         <Box className={classes.mycards}>
@@ -200,7 +202,7 @@ const Sidebar = ({side,setSide}) => {
         <Box className={classes.menu}>
             <Box className={classes.menuItem} sx={{background:(loc==='' || loc==='dashboard')?'#f4f4f4':'transparent'}} data="dashboard" onClick={handleClick}><DashboardOutlinedIcon sx={{color:'#70707c',fontSize:'20px',marginLeft:'10px',marginRight:'10px'}}/>DashBoard</Box>
             <Box className={classes.menuItem} sx={{background:loc==='transfer'?'#f4f4f4':'transparent'}} data="transfer" onClick={()=>setOpen(true)}><MonetizationOnOutlinedIcon sx={{color:'#70707c',fontSize:'20px',marginLeft:'10px',marginRight:'10px'}}/>Transfer</Box>
-            <Box className={classes.menuItem} sx={{background:loc==='forex'?'#f4f4f4':'transparent'}} data="forex" onClick={handleClick}><CurrencyExchangeIcon sx={{color:'#70707c',fontSize:'20px',marginLeft:'10px',marginRight:'10px'}}/>Forex</Box>
+            <Box className={classes.menuItem} sx={{background:loc==='forex'?'#f4f4f4':'transparent'}} data="forex" onClick={()=>{setForexOpen(true);setSide(false)}}><CurrencyExchangeIcon sx={{color:'#70707c',fontSize:'20px',marginLeft:'10px',marginRight:'10px'}}/>Forex</Box>
             <Box className={classes.menuItem} sx={{background:loc==='settings'?'#f4f4f4':'transparent'}} data="settings" onClick={handleClick}><SettingsOutlinedIcon sx={{color:'#70707c',fontSize:'20px',marginLeft:'10px',marginRight:'10px'}}/> Settings</Box>
         </Box>
         <Box className={classes.logout}>
@@ -209,6 +211,7 @@ const Sidebar = ({side,setSide}) => {
             }}>Logout</Box>
         </Box>
         <PayUsingCard open={open} setOpen={setOpen} card={null}/>
+        <Forex open={forex} setOpen={setForexOpen}/>
     </Box>
   )
 }

@@ -19,12 +19,18 @@ import './Carousel.css'
 import { ToastHtml } from '../Toast';
 import { Howl } from 'howler';
 import { useNavigate } from 'react-router-dom';
+import getSymbolFromCurrency from 'currency-symbol-map';
+import CurrencyFlag from 'react-currency-flags'
 const useStyle=makeStyles((theme)=>({
     outer:{
         width:'100%',
         height:'100%',
         position:'relative',
-        background:'transparent',
+        // background:'transparent',
+        // background:'url(https://t3.ftcdn.net/jpg/04/03/02/92/360_F_403029269_KCrGHt5AdtV7GSD2KeP8Wk2PYIbVKlNU.jpg)',
+        background:'url(https://media.istockphoto.com/id/1267967888/photo/rendered-3d-blocks-minimalist-white-abstract-background.jpg?s=612x612&w=0&k=20&c=pbYQJ4raEaVC0arc6xdAB9IUThbfWZdRl9VnnaIu8vU=)',
+        backgroundSize:'cover',
+        backgroundPosition:'center',
         overflowY:'scroll',
         msOverflowStyle:'none',
         '&::-webkit-scrollbar':{
@@ -67,12 +73,12 @@ const useStyle=makeStyles((theme)=>({
         alignItems:'center',
         flexDirection:'column',
         background:'transparent',
-        gap:'50px'
+        gap:'50px',
     },
     balance:{
         width:'150px',
         cursor:'pointer',
-        height:'150px',
+        height:'130px',
         borderRadius:'20px',
         padding:'20px',
         background:'white',
@@ -158,7 +164,20 @@ const useStyle=makeStyles((theme)=>({
     laoding:{
         cursor:'pointer',
         borderRadius:'20px',
-    }
+    },
+    TextField:{
+        "& .MuiInputBase-input.Mui-disabled": {
+            WebkitTextFillColor: "#000000",
+        },
+        '& .MuiInputLabel-root.Mui-disabled': {
+            color:'black',
+        },
+        '&:hover':{
+            '& .MuiOutlinedInput-root.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'black', // Custom color for disabled fieldset border
+              },
+        }
+    },
 }))
 const Balance = ({setTransact}) => {
     const [copy,setCopy]=useState(false);
@@ -188,11 +207,11 @@ const Balance = ({setTransact}) => {
                 alignItems:'center'
             }}>
                 <Box sx={{fontSize:'30px',fontWeight:'800'}}>Interplanetary Bank</Box>
-                <TextField sx={{width:'100%'}} id="outlined-basic" label="Account Holder" variant="outlined" value={`${userInfo?.firstName} ${userInfo?.lastName?userInfo?.lastName:''}`}/>
+                <TextField sx={{width:'100%'}} id="outlined-basic" label="Account Holder" variant="outlined" value={`${userInfo?.firstName} ${userInfo?.lastName?userInfo?.lastName:''}`} disabled className={classes.TextField}/>
                 {/* <Box className={classes.detail}>Account Holder : {userInfo?.firstName} {userInfo?.lastName}</Box> */}
                 {/* <Box className={classes.detail}>Email : {userInfo?.email}</Box> */}
-                <TextField sx={{width:'100%'}} id="outlined-basic" label="Email" variant="outlined" value={`${userInfo?.email}`}/>
-                <TextField sx={{width:'100%'}} id="outlined-basic" label='Account Number' variant="outlined" value={`${userInfo?.accountNo}`}
+                <TextField sx={{width:'100%'}} id="outlined-basic" label="Email" variant="outlined" value={`${userInfo?.email}`} disabled className={classes.TextField}/>
+                <TextField sx={{width:'100%'}} id="outlined-basic" label='Account Number' variant="outlined" value={`${userInfo?.accountNo}`} disabled className={classes.TextField}
                 InputProps={{
                     endAdornment: (
                         <InputAdornment position="end">
@@ -230,25 +249,32 @@ const Balance = ({setTransact}) => {
                 width:'100%',
                 display:'flex',
                 flexDirection:'column',
-                gap:'30px'
+                alignItems:'center',
+                gap:'30px',
             }}>
                 <Box sx={{width:'100%',display:'flex',justifyContent:'center',fontSize:'20px',fontWeight:'600'}}>Account Balance</Box>
-                <Box sx={{width:'100%',display:'flex',justifyContent:'center'}}>
-                {loading && <Skeleton variant='rectangular' width={200} height={200} className={classes.laoding}></Skeleton>}
+                <Box sx={{width:'80%',display:'flex',gap:'30px',overflowX:'scroll',msOverflowStyle:'none',
+                    // '&::-webkit-scrollbar':{
+                    //         display:'none'
+                    // },
+                }}>
+                {loading && <Skeleton variant='rectangular' width={170} height={190} className={classes.laoding}></Skeleton>}
                 {balances?.map((curr)=>{
                     return (
                         <Box className={classes.balance} sx={{
                             color:'rgb(25, 121, 230)',
                         }}>
-                            <Box className={`${curr?.currency==='INR'?classes.rupees:classes.usd}`}>{curr?.currency==='INR'?<CurrencyRupeeIcon/>:<CurrencyExchangeIcon/>}</Box>
+                            <Box className={`${curr?.currency==='INR'?classes.rupees:classes.usd}`}><CurrencyFlag currency={curr?.currency} /></Box>
                             <Box sx={{marginTop:'10px',fontSize:'20px',color:'black'}}>{curr?.currency}</Box>
                             <Box sx={{
                                 color:curr?.currency==='INR'?'rgb(25, 121, 230)':'red',
-                            }}>{curr?.currency==='INR'?<CurrencyRupeeIcon/>:<CurrencyExchangeIcon/>}
+                                fontSize:'30px',
+                                fontWeight:'bold'
+                            }}>{getSymbolFromCurrency(curr?.currency)}
                              <span style={{
                                 fontSize:'30px',
                                 fontWeight:'bold'
-                            }}>{Math.floor(curr?.balance)}</span></Box>
+                            }}>{Number(curr?.balance).toFixed(2)}</span></Box>
                         </Box>
                     )
                 })}

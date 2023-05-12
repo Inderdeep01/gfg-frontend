@@ -12,6 +12,7 @@ import {EventSourcePolyfill as EventSource} from 'event-source-polyfill'
 import { SET_ACCOUNT_TRANSACTIONS } from '../store/Constants/TransactionsConstant';
 import { useNavigate } from 'react-router-dom';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import getSymbolFromCurrency from 'currency-symbol-map';
 
 const useStyle=makeStyles((theme)=>({
     outer:{
@@ -172,7 +173,7 @@ const AccountTransactions = ({setTransact}) => {
                     display:'flex',
                     background:'#f8f9fb',
                 }}>
-                    <Box className={classes.center} sx={{width:'40%'}}>Card</Box>
+                    <Box className={classes.center} sx={{width:'40%'}}>A/C or Card</Box>
                     <Box className={classes.center} sx={{width:'40%'}}>To/From</Box>
                     <Box className={classes.center} sx={{width:'20%'}}>Amount</Box>
                 </Box>
@@ -248,13 +249,13 @@ const AccountTransactions = ({setTransact}) => {
                                 color:(transaction?.from?._id===userInfo?._id)?'red':'green',
                                 fontWeight:'500'
                             }}
-                            > {transaction?.from===null || transaction?.from?._id!==userInfo?._id?'+':'-'} {transaction?.currency==='INR'?'₹':'$'} {transaction?.amount}</Box>
+                            > {transaction?.from===null || transaction?.from?._id!==userInfo?._id?'+':'-'} {getSymbolFromCurrency(transaction?.currency)} {transaction?.amount}</Box>
                         </Box>
                     )
                 })}
                 </InfiniteScroll>
                 {!loading && transactions?.length===0 && <Box sx={{width:'100%',height:'100%',display:'flex',justifyContent:'center',alignItems:'center',flexDirection:'column'}}>
-                    <ReceiptLongIcon sx={{fontSize:'100px',color:'#fdd131'}}/>
+                    <ReceiptLongIcon sx={{fontSize:'100px',color:'#1979e6'}}/>
                     <Box sx={{fontSize:'25px',fontWeight:'700'}}>No Transactions Yet</Box>
                     <Box sx={{width:'85%',textAlign:'center'}}>After your first transaction you will be able to view here</Box>
                     </Box>}

@@ -6,6 +6,7 @@ import Carousel from '../components/Carousel';
 import SignUp from '../components/SignUp';
 import Login from '../components/Login';
 import Verify from '../components/Verify';
+import ForgetPassword from '../components/ForgetPassword';
 
 const useStyle=makeStyles((theme)=>({
     root:{
@@ -143,7 +144,7 @@ const Auth = ({activeIndex,setActiveIndex,setPrevRoute}) => {
     const {method}=useParams();
     const navigate=useNavigate();
     useEffect(()=>{
-      if(method!=='login' && method!=='signup' && method!=='verify'){
+      if(method!=='login' && method!=='signup' && method!=='verify' && method!=='forgetPassword'){
         navigate('/auth/login');
       }
     },[method,navigate])
@@ -154,7 +155,7 @@ const Auth = ({activeIndex,setActiveIndex,setPrevRoute}) => {
           <Carousel activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
         </Box>
         <Box className={classes.auth}>
-          {method!=='verify' && 
+          {method!=='verify' && method!=='forgetPassword' && 
           <Box className={classes.upperdiv}>
             <Box className={classes.wrapbtn}>
               <Link to='/auth/login' className={`${method==='login'?classes.active:classes.btn}`}>Login</Link>
@@ -162,7 +163,7 @@ const Auth = ({activeIndex,setActiveIndex,setPrevRoute}) => {
             </Box>
           </Box>
           }
-          {method!=='verify' &&
+          {method!=='verify' && method!=='forgetPassword' &&
           <Box className={classes.heading}>
             <Box className={classes.inheading}>
               <Box className={`${method==='login' && classes.activehead}`} sx={{cursor:'pointer'}} onClick={()=>{navigate('/auth/login')}}>Login</Box>
@@ -182,7 +183,7 @@ const Auth = ({activeIndex,setActiveIndex,setPrevRoute}) => {
             width:'100%',
             height:'100%',
           }}>
-            {method==='login'?<Login setPrevRoute={setPrevRoute}/>:method==='signup'?<SignUp/>:<Verify/>}
+            {method==='login'?<Login setPrevRoute={setPrevRoute}/>:method==='signup'?<SignUp/>:method==='forgetPassword'?<ForgetPassword/>:<Verify/>}
           </Box>
         </Box>
       </Box>

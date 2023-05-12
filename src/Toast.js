@@ -1,3 +1,4 @@
+import getSymbolFromCurrency from "currency-symbol-map";
 import toast from "react-hot-toast"
 
 export const ToastHtml=(t,tx,navigate)=>{
@@ -20,7 +21,7 @@ export const ToastHtml=(t,tx,navigate)=>{
                 {tx.from.firstName} {tx.from.lastName?tx.from.lastName:''}
               </p>
               <p className="mt-1 text-sm text-gray-500">
-                Sent you {tx.currency=='INR'?'₹':'$'} {tx.amount}
+                Sent you {getSymbolFromCurrency(tx.currency)} {tx.settledAmount}
               </p>
             </div>
           </div>

@@ -5,7 +5,7 @@ import AmountPage from './AmountPage'
 import PIN from './PIN';
 import GppMaybeIcon from '@mui/icons-material/GppMaybe';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { URL } from '../../ServerURL';
 import { useSelector } from 'react-redux';
@@ -75,6 +75,10 @@ const useStyle=makeStyles((theme)=>({
   }
 }))
 const PayUsingCard = ({open,setOpen}) => {
+  var path=useLocation().pathname;
+  path =path.split("/")[1];
+  const {id}=useParams();
+  const navigate=useNavigate();
   useEffect(()=>{
     if(open===false){
       setLoading(false);
@@ -86,6 +90,9 @@ const PayUsingCard = ({open,setOpen}) => {
       setAccount('');
       setAmount('');
       setTo(null);
+      if(path==='pay' && !id){
+        navigate('/');
+      }
     }
   },[open])
 
@@ -129,9 +136,6 @@ const PayUsingCard = ({open,setOpen}) => {
     }
   }
   const [fromQr,setFromQr]=useState(false);
-  var path=useLocation().pathname;
-  path =path.split("/")[1];
-  const {id}=useParams();
   useEffect(()=>{
       if(path==='pay' && id){
         setOpen(true);

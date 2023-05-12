@@ -1,6 +1,6 @@
 import { FormHelperText, makeStyles } from '@material-ui/core'
 import { Box, Button, CircularProgress, IconButton, InputAdornment, InputLabel, TextField, ThemeProvider, createTheme } from '@mui/material';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {Visibility,VisibilityOff} from '@mui/icons-material';
 import FilledInput from '@mui/material/FilledInput';
 import FormControl from '@mui/material/FormControl';
@@ -121,6 +121,8 @@ const SignUp = () => {
       dispatch(signup(firstName,lastName,email.trim(),password,navigate));
     }
   }
+  const emailRef=useRef();
+  const passRef=useRef();
   return (
     <ThemeProvider theme={darkTheme}>
     <Box className={classes.outer}>
@@ -130,6 +132,11 @@ const SignUp = () => {
           variant="filled"
           color="success"
           value={name}
+          onKeyUp={(e)=>{
+            if(e.key==='Enter'){
+              emailRef.current.focus();
+            }
+          }}
           onChange={(e)=>{setName(e.target.value)}}
           className={classes.input}
           helperText={err.for==='name'?err.message:''}
@@ -145,7 +152,13 @@ const SignUp = () => {
           label="E-Mail"
           variant="filled"
           color="success"
+          inputRef={emailRef}
           value={email}
+          onKeyUp={(e)=>{
+            if(e.key==='Enter'){
+              passRef.current.click()
+            }
+          }}
           onChange={(e)=>{setEmail(e.target.value)}}
           className={classes.input}
           helperText={err.for==='email'?err.message:''}
@@ -163,6 +176,14 @@ const SignUp = () => {
             id="filled-adornment-password"
             color='success'
             value={password}
+            ref={passRef}
+            onKeyUp={(e)=>{
+              if(e.key==='Enter'){
+                if(name && email && password){
+                  handleSubmit();
+                }
+              }
+            }}
             onChange={(e)=>{setPassword(e.target.value)}}
             error={err.for==='password'?true:false}
             type={showPassword ? 'text' : 'password'}

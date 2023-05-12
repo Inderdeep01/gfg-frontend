@@ -8,7 +8,8 @@ import { URL } from '../ServerURL';
 import axios from 'axios';
 import { NetworkGradient, NetworkImage } from '../utils/gradientAndImages';
 import InfiniteScroll, {} from 'react-infinite-scroll-component'
-
+import { useNavigate } from 'react-router-dom';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 const useStyle=makeStyles((theme)=>({
     outer:{
         width:'100%',
@@ -84,7 +85,7 @@ const CardTransactions = ({setTransact,cardId}) => {
                     'Authorization':`Bearer ${userInfo.token}`
                 }
             }
-            const {data}=await axios.post(`${URL}/getTx/card?page=1`,{
+            const {data}=await axios.post(`${URL}/getTx/card?page=${page}`,{
                 _id:cardId,
             },config);
             // console.log(data);
@@ -93,7 +94,7 @@ const CardTransactions = ({setTransact,cardId}) => {
                 setMore(false);
             }
             else{
-                setTransactions(data);
+                setTransactions([...transactions,...data]);
             }
         }
         catch(err)
@@ -103,7 +104,45 @@ const CardTransactions = ({setTransact,cardId}) => {
             setError(e);
         }
     }
-    console.log(transactions);
+
+
+    const fetchTX=async()=>{
+        // console.log('Calling Fetch Txs')
+        try{
+            const config={
+                headers:{
+                    "Content-Type":'application/json',
+                    'Authorization':`Bearer ${userInfo.token}`
+                }
+            }
+            const {data}=await axios.post(`${URL}/getTx/card?page=1`,{
+                _id:cardId,
+            },config);
+            setPage(page+1);
+            setLoading(false);
+            if(data?.length===0){
+                setMore(false);
+            }
+            else{
+                setTransactions([...data]);
+            }
+        }
+        catch(err)
+        {
+            var e=err.response && err.response.data.message? err.response.data.message:err.message;
+            // setLoading(false);
+            setError(e);
+        }
+    }
+    useEffect(()=>{
+        setPage(1);
+        fetchTX();
+    },[userInfo])
+    // console.log(transactions);
+    function mini(num){
+        return num?.substr(num?.length-4,num?.length);
+    }
+    const navigate=useNavigate();
   return (
     <Box className={classes.outer}>
         <Box className={classes.back} onClick={()=>{setTransact(false)}}><ArrowBackIosNewIcon sx={{fontSize:'30px'}}/></Box>
@@ -139,14 +178,14 @@ const CardTransactions = ({setTransact,cardId}) => {
                     '&::-webkit-scrollbar':{
                             display:'none'
                     },
-                }}>
+                }} id="accountTransactionDiv">
                 <InfiniteScroll
-                    dataLength={20*page}
+                    dataLength={transactions?.length<=20 || !transactions?20:transactions?.length}
                     next={fetchTransactions}
-                    // inverse={true} //
+                    // inverse={true}
                     hasMore={more}
-                    loader={<span>Loading....</span>}
-                    scrollableTarget="scrollableDiv"
+                    loader={<Box sx={{width:'100%',display:'flex',justifyContent:'center'}}><CircularProgress size={30} sx={{color:'#1979e6'}}/></Box>}
+                    scrollableTarget="accountTransactionDiv"
                 >
                 {transactions?.map((transaction,index)=>{
                     return (
@@ -155,8 +194,12 @@ const CardTransactions = ({setTransact,cardId}) => {
                             height:'70px',
                             display:'flex',
                             alignItems:'center',
-                            borderBottom:'1px solid lightgrey'
-                        }}>
+                            borderBottom:'1px solid lightgrey',
+                            cursor:'pointer',
+                            '&:hover':{
+                                background:'#e0e1e7'
+                            }
+                        }} onClick={()=>navigate(`/?transactionDetails=${transaction._id}`)}>
                             <Box className={classes.center} sx={{width:'40%',display:'flex',gap:'10px'}}>
                                 <Box sx={{width:'35%',height:'50px',display:'flex',justifyContent:'center',alignItems:'center'}}>
                                     <Box sx={{
@@ -168,29 +211,42 @@ const CardTransactions = ({setTransact,cardId}) => {
                                         justifyContent:'center',
                                         alignItems:'center'
                                     }}>
-                                        <img src={`${transaction?.from!==null?NetworkImage[transaction?.card?.network]:NetworkImage['IPBS']}`} style={{
-                                            width:transaction?.from===null?'50px':'70%',
-                                            height:transaction?.from===null?'50px':'70%',
+                                        <img src={`${transaction?.type==='card'?NetworkImage[transaction?.card?.network]:NetworkImage['IPBS']}`} style={{
+                                            width:transaction?.type!=='card'?'50px':'70%',
+                                            height:transaction?.type!=='card'?'50px':'70%',
                                             objectFit:'contain'
                                         }} />
                                     </Box>
                                 </Box>
                                 <Box sx={{width:'55%',height:'50px'}}>
-                                    <Box>*{transaction?.from!==null?transaction?.card?.cardNumber.substring(transaction?.card?.cardNumber?.length-4,transaction?.cardNumber?.length):transaction?.to?.accountNo?.substring(transaction?.to?.accountNo?.length-4,transaction?.to?.accountNo?.length)}</Box>
-                                    <Box sx={{fontSize:'13px'}}>{transaction?.from!==null?transaction?.card?.purpose:'IPBS Bank'}</Box>
+                                    <Box>*{
+                                        transaction?.type==='simpleTransfer'?
+                                        `XX ${mini(transaction?.to?.accountNo)}`
+                                        :
+                                        transaction?.type==='Deposit'?
+                                        `XX ${mini(transaction?.to?.accountNo)}`
+                                        :
+                                        ''
+                                        }</Box>
+                                    <Box sx={{fontSize:'13px'}}>{transaction?.type==='card'?transaction?.card?.purpose:'IPBS Bank'}</Box>
                                 </Box>
                             </Box>
-                            <Box className={classes.center} sx={{width:'40%'}}>{(transaction?.from?._id===userInfo?._id)?(transaction?.to?.firstName+' '+transaction?.to?.lastName):(transaction?.from?.firstName+' '+transaction?.from?.lastName)}</Box>
+                            <Box className={classes.center} sx={{width:'40%'}}>{(transaction?.from?._id===userInfo?._id)?(transaction?.to?.firstName+' '+transaction?.to?.lastName):transaction?.from!==null?(transaction?.from?.firstName+' '+transaction?.from?.lastName):'Money Deposited'}</Box>
                             <Box className={classes.center} sx={{
                                 width:'20%',
                                 color:(transaction?.from?._id===userInfo?._id)?'red':'green',
                                 fontWeight:'500'
                             }}
-                            > {transaction?.from===null?'+':'-'} {transaction?.currency==='INR'?'₹':'$'} {transaction?.amount}</Box>
+                            > {transaction?.from===null || transaction?.from?._id!==userInfo?._id?'+':'-'} {transaction?.currency==='INR'?'₹':'$'} {transaction?.amount}</Box>
                         </Box>
                     )
                 })}
                 </InfiniteScroll>
+                {!loading && transactions?.length===0 && <Box sx={{width:'100%',height:'100%',display:'flex',justifyContent:'center',alignItems:'center',flexDirection:'column'}}>
+                    <ReceiptLongIcon sx={{fontSize:'100px',color:'#1979e6'}}/>
+                    <Box sx={{fontSize:'25px',fontWeight:'700'}}>No Transactions Yet</Box>
+                    <Box sx={{width:'85%',textAlign:'center'}}>After your first transaction you will be able to view here</Box>
+                    </Box>}
                 </Box>
             </Box>
         </Box>

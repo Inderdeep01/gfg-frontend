@@ -18,6 +18,8 @@ import { ADD_ACCOUNT_TRANSACTION, SET_SOCKET } from '../store/Constants/Transact
 import toast from 'react-hot-toast';
 import { ToastHtml } from '../Toast';
 import {Howl} from 'howler'
+import { GET_ACCOUNT_BALANCE_SUCCESS } from '../store/Constants/AccountBalanceConstant';
+import { changeBalance } from '../store/Actions/changeBalance';
 const useStyle=makeStyles((theme)=>({
     outer:{
         width:'80%',
@@ -71,17 +73,18 @@ const Body = () => {
       if(socket && userInfo){
         socket.emit("setup",userInfo?.token);
         socket.on("connected",()=>console.log('Connected to websocket'));
-        socket.on("newTx",(tx)=>{
+        socket.on("newTransactionRecieved",(tx)=>{
           notify(tx);
+          dispatch(changeBalance(tx));
           dispatch({type:ADD_ACCOUNT_TRANSACTION,payload:tx});
         })
       }
     },[socket])
-    console.log(transactions);
+    // console.log(transactions);
     return (
       <Box className={classes.outer}>
         <button ref={ref} style={{display:'none'}}></button>
-        {page===undefined || page==='pay'?<DashBoard/>:page==='forex'?<Forex/>:page==='settings'?<Settings/>:page==='card' && no!==undefined?<CardSelected cardId={no}/>:<Error/>}
+        {page===undefined || page==='pay'?<DashBoard/>:page==='settings'?<Settings/>:page==='card' && no!==undefined?<CardSelected cardId={no}/>:<Error/>}
       </Box>
     )
 }

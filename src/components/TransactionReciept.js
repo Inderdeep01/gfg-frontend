@@ -4,6 +4,8 @@ import { useSelector } from "react-redux";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useLocation, useNavigate } from "react-router-dom";
 import { currencySymbol } from "../utils/gradientAndImages";
+import getSymbolFromCurrency from "currency-symbol-map";
+import numberToWords from 'number-to-words';
 const useStyle = makeStyles((theme) => ({
   modal: {
     display: "flex",
@@ -30,77 +32,38 @@ const useStyle = makeStyles((theme) => ({
     // padding: theme.spacing(2, 4, 3),
   },
 }));
-var a = [
-  "",
-  "One ",
-  "Two ",
-  "Three ",
-  "Four ",
-  "Five ",
-  "Six ",
-  "Seven ",
-  "Eight ",
-  "Nine ",
-  "Ten ",
-  "Eleven ",
-  "Twelve ",
-  "Thirteen ",
-  "Fourteen ",
-  "Fifteen ",
-  "Sixteen ",
-  "Seventeen ",
-  "Eighteen ",
-  "Nineteen ",
-];
-var b = [
-  "",
-  "",
-  "twenty",
-  "Thirty",
-  "Forty",
-  "Fifty",
-  "Sixty",
-  "Seventy",
-  "Eighty",
-  "Ninety",
-];
+function capitalizeWords(str) {
+  return str.replace(/\b\w/g, (match) => match.toUpperCase());
+}
+export function inWords(amount, currency) {
 
-export function inWords (n) {
-  if (n < 0)
-    return false;
- var single_digit = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine']
- var double_digit = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen']
- var below_hundred = ['Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety']
-if (n === 0) return 'Zero'
-function translate(n) {
-  var word = ""
-  if (n < 10) {
-    word = single_digit[n] + ' '
+  const currencyMap = {
+    INR: { name: 'Rupees', subunit: 'Paise' },
+    USD: { name: 'Dollars', subunit: 'Cents' },
+    CAD: { name: 'Canadian Dollars', subunit: 'Cents' },
+    EUR: { name: 'Euros', subunit: 'Cents' },
+    JPY: { name: 'Yen', subunit: 'Sen' },
+    RUB: { name: 'Rubles', subunit: 'Kopeks' },
+    AED: { name: 'Dirhams', subunit: 'Fils' },
+    // Add more currencies and their names/subunits as needed
+  };
+
+  const { name, subunit } = currencyMap[currency] || { name: currency, subunit: 'Subunit' };
+
+  const [whole, decimal = ''] = String(amount).split('.');
+
+  let result = numberToWords.toWords(parseInt(whole));
+  result += ` ${name}`;
+
+  if (decimal) {
+    const paddedDecimal = decimal.padEnd(2, '0');
+    const decimalInWords = numberToWords.toWords(parseInt(paddedDecimal));
+    result += ` and ${decimalInWords} ${subunit}`;
   }
-  else if (n < 20) {
-    word = double_digit[n - 10] + ' '
-  }
-  else if (n < 100) {
-    var rem = translate(n % 10)
-    word = below_hundred[(n - n % 10) / 10 - 2] + ' ' + rem
-  }
-  else if (n < 1000) {
-    word = single_digit[Math.trunc(n / 100)] + ' Hundred ' + translate(n % 100)
-  }
-  else if (n < 100000) {
-    word = translate(parseInt(n / 1000)).trim() + ' Thousand ' + translate(n % 1000)
-  }
-  else if (n < 10000000) {
-    word = translate(parseInt(n / 100000)).trim() + ' Lakh ' + translate(n % 100000)
-  }
-  else {
-    word = translate(parseInt(n / 10000000)).trim() + ' Crore ' + translate(n % 10000000)
-  }
-  return word
+
+  return capitalizeWords(result + ' Only');
 }
- var result = translate(n) 
-return result.trim()+' Only'
-}
+
 export const trimAccountNumber=(no)=>{
   return no?.substr(0,4)+' XXXX '+no?.substr(no?.length-4,no?.length);
 }
@@ -124,7 +87,7 @@ const TransactionReciept = () => {
         setTransaction(result[0]);
         (result[0]?.from?._id===userInfo?._id)?setFromMy(true):setFromMy(false);
         (result[0]?.to?._id===userInfo?._id)?setToMy(true):setToMy(false);
-        setWords(inWords(result[0]?.amount));
+        setWords(inWords(result[0]?.amount,result[0]?.currency));
         setDate(new Date(result[0].createdAt).toUTCString())
         setOpen(true);
       }
@@ -171,8 +134,8 @@ const TransactionReciept = () => {
                 }}>
                   <Box sx={{width:'92%',height:'100%',margin:'20px',marginTop:'20px'}}>
                     <Box sx={{fontSize:'18px',fontWeight:'400'}}>Amount</Box>
-                    <Box sx={{fontSize:'25px',fontWeight:'700',display:'flex',alignItems:'center',gap:'15px'}}>{currencySymbol[transaction?.currency]} {transaction?.amount} <img src="/img/greenverified.png" style={{width:'25px'}}/></Box>
-                    <Box sx={{ paddingBottom:'20px',borderBottom:'1px solid lightgrey'}}>{transaction?.currency} {words}</Box>
+                    <Box sx={{fontSize:'25px',fontWeight:'700',display:'flex',alignItems:'center',gap:'15px'}}>{getSymbolFromCurrency(transaction?.currency)} {transaction?.amount} <img src="/img/greenverified.png" style={{width:'25px'}}/></Box>
+                    <Box sx={{ paddingBottom:'20px',borderBottom:'1px solid lightgrey'}}>{words}</Box>
                     <Box sx={{fontSize:'18px',fontWeight:'400',marginTop:'20px'}}>To {toMy && 'Your'}</Box>
                     <Box sx={{fontSize:'25px',fontWeight:'500',display:'flex',alignItems:'center',gap:'15px',position:'relative'}}>{toMy?'Interplanetary Bank':`${transaction?.to?.firstName} ${transaction?.to?.lastName}`} <img src="/img/IPBS.png" style={{width:'70px',position:'absolute',right:'10px'}}/></Box>
                     <Box sx={{paddingBottom:'20px',borderBottom:'1px solid lightgrey'}}> A/C No. - {trimAccountNumber(transaction?.to?.accountNo)} <span style={{color:'#1979e6',cursor:'pointer'}} onClick={()=>CopyToClipboard(transaction?.to?.accountNo)}>Copy</span></Box>
