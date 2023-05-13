@@ -4,9 +4,9 @@ import './Loading.css'
 const Loading = () => {
   return (
     <div>
-        <div class="snippet" data-title="dot-flashing">
-          <div class="stage">
-            <div class="dot-flashing"></div>
+        <div className="snippet" data-title="dot-flashing">
+          <div className="stage">
+            <div className="dot-flashing"></div>
           </div>
         </div>
     </div>

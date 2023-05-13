@@ -76,7 +76,7 @@ const Recipient = ({account,setAccount,setRecipientPage,setAmountPage,setOpen,to
         else{
           setTo(data);
           setErr('');
-          console.log(data);
+          // console.log(data);
         }
         setLoading(false);
       }catch(error){

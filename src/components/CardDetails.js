@@ -13,6 +13,7 @@ import BlockIcon from '@mui/icons-material/Block';
 import WifiProtectedSetupIcon from '@mui/icons-material/WifiProtectedSetup';
 import BlockCard from "./BlockCard";
 import ChangePin from "./ChangePin";
+import SetLimit from "./SetLimit.js";
 const useStyle=makeStyles((theme)=>({
     modal: {
         display: 'flex',
@@ -236,6 +237,7 @@ const CardDetails = ({setTransact,cardId}) => {
       }
     }
     const [pin,setPin]=useState(false);
+    const [limit,setLimit]=useState(false);
   return (
     <Box sx={{
         width:'100%',
@@ -303,7 +305,7 @@ const CardDetails = ({setTransact,cardId}) => {
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
         <MenuItem onClick={()=>{handleClose();setPin(true)}}><VpnKeyIcon sx={{marginRight:'10px'}}/>Change PIN</MenuItem>
-        <MenuItem onClick={handleClose}><WifiProtectedSetupIcon sx={{marginRight:'10px'}}/>Set Limit</MenuItem>
+        <MenuItem onClick={()=>{handleClose();setLimit(true)}}><WifiProtectedSetupIcon sx={{marginRight:'10px'}}/>Set Limit</MenuItem>
         <MenuItem onClick={()=>{handleClose();blockUnblockHandler()}}><BlockIcon sx={{marginRight:'10px'}}/>{card?.isBlocked?'UnBlock':'Block'} Card</MenuItem>
         <MenuItem onClick={()=>{handleClose();setDel(true)}}><DeleteOutlineIcon sx={{marginRight:'10px'}}/>Delete Card</MenuItem>
       </Menu>
@@ -355,6 +357,7 @@ const CardDetails = ({setTransact,cardId}) => {
     <BlockCard open={block} setOpen={setBlock} card={card} method="block"/>
     <BlockCard open={unblock} setOpen={setUnBlock} card={card} method="unblock"/>
     <ChangePin open={pin} setOpen={setPin} card={card}/>
+    <SetLimit open={limit} setOpen={setLimit} card={card}/>
     </Box>
   );
 };

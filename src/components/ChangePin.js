@@ -103,7 +103,7 @@ const ChangePin = ({open,setOpen,card}) => {
                     'Authorization':`Bearer ${userInfo?.token}`
                 }
             }
-            console.log(card.cardNumber);
+            // console.log(card.cardNumber);
             const {data}=await axios.patch(`${URL}/card`,{
                 action:'changePIN',
                 cardNumber:card.cardNumber,

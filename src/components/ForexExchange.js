@@ -227,6 +227,7 @@ const ForexExchange = ({ open, setOpen,setOtp,setTid,setTxObj,transfer,setTransf
         }
         catch(err)
         {
+            console.log(err);
             var e=err.response && err.response.data.message? err.response.data.message:err.message;
             // console.log(e);
             setLoading(false);
@@ -240,6 +241,11 @@ const ForexExchange = ({ open, setOpen,setOtp,setTid,setTxObj,transfer,setTransf
     setLoading(true);
     if(!account){
       setError("Reciever Bank Account can't be empty");
+      setLoading(false);
+      return;
+    }
+    if(to===null){
+        setError("Invalid Reciever Bank Account");
       setLoading(false);
       return;
     }
@@ -298,11 +304,14 @@ const ForexExchange = ({ open, setOpen,setOtp,setTid,setTxObj,transfer,setTransf
   const [err,setErr]=useState('');
 
 
-  useEffect(()=>{
-    if(amount){
-      const r=rate[`${currFrom}_${currTo}`];
+  const changeAmountTo=()=>{
+    const r=rate[`${currFrom}_${currTo}`];
       let num=JSON.parse(amount)*r;
       setAmountTo(formatNumber(num));
+  }
+  useEffect(()=>{
+    if(amount){
+      changeAmountTo();
     }
   },[amount])
 
@@ -351,11 +360,11 @@ const ForexExchange = ({ open, setOpen,setOtp,setTid,setTxObj,transfer,setTransf
               <Box sx={{width:'100%',height:'12%',borderBottom:'1px solid lightgrey',alignItems:'center',display:'flex'}}>
                 <ArrowBackIosIcon sx={{marginLeft:'20px',fontSize:'30px',cursor:'pointer'}} onClick={()=>setOpen(false)}/>
                 <Box sx={{flexGrow:'1',display:'flex',justifyContent:'center',fontSize:'22px',fontWeight:'600',position:'relative',left:'20px'}}>Currency Exchange</Box>
-                <Box sx={{display:'flex',justifyContent:'flex-end'}}>
+                <Box sx={{display:'flex',justifyContent:'flex-end',alignItems:'center',display:'flex'}}>
                     <FormControlLabel sx={{marginRight:'20px',marginTop:'10px'}}
                     checked={transfer}
                         control={<IOSSwitch sx={{ m: 1 }} onChange={()=>setTransfer(!transfer)}/>}
-                        label={<span style={{marginLeft:'10px',fontWeight:'600'}}>Transfer</span>}
+                        label={<span style={{marginLeft:'15px',fontWeight:'500',color:'black'}}>Transfer</span>}
                     />
                 </Box>
               </Box>
@@ -372,7 +381,7 @@ const ForexExchange = ({ open, setOpen,setOtp,setTid,setTxObj,transfer,setTransf
                         value={amount}
                         onFocus={(e) => e.target.addEventListener("wheel", function (e) { e.preventDefault() }, { passive: false })}
                         onChange={(e)=>{
-                          if((e.target.value)<=10000000 && (e.target.value)>'0'){
+                          if((e.target.value)<=10000000 && (e.target.value)>0){
                             setAmount(e.target.value);
                           }
                           else if(e.target.value?.length===0){
@@ -419,6 +428,9 @@ const ForexExchange = ({ open, setOpen,setOtp,setTid,setTxObj,transfer,setTransf
                 var temp=currFrom;
                 setCurrFrom(currTo);
                 setCurrTo(temp);
+                const r=rate[`${currTo}_${currFrom}`];
+                let num=JSON.parse(amount)*r;
+                setAmountTo(formatNumber(num));
               }}><ImportExportIcon sx={{fontSize:'50px',position:'relative'}}/></Box>
               <Box sx={{width:'80%',borderBottom:'1px solid lightgrey',height:transfer?'20%':'30%',display:'flex',transition:'all 300ms'}}>
                   <Box sx={{width:'50%',height:'100%',justifyContent:'center',display:'flex',flexDirection:'column'}}>
@@ -429,7 +441,7 @@ const ForexExchange = ({ open, setOpen,setOtp,setTid,setTxObj,transfer,setTransf
                         id="outlined"
                         type='number'
                         placeholder="0"
-                        disabled
+                        // disabled
                         value={amountTo}
                         onFocus={(e) => e.target.addEventListener("wheel", function (e) { e.preventDefault() }, { passive: false })}
                         // onChange={(e)=>{

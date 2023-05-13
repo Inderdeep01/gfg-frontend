@@ -53,7 +53,12 @@ const Body = () => {
     },[userInfo])
     const {socket}=useSelector(state=>state.socket);
     useEffect(()=>{
-      dispatch({type:SET_SOCKET,payload:io(URL)});
+      const socket=io(URL);
+      dispatch({type:SET_SOCKET,payload:socket});
+      return ()=>{
+        console.log('Socket Disconnected');
+        socket.disconnect();
+      }
     },[])
 
     const ref=useRef();
@@ -79,7 +84,7 @@ const Body = () => {
           dispatch({type:ADD_ACCOUNT_TRANSACTION,payload:tx});
         })
       }
-    },[socket])
+    },[socket,userInfo])
     // console.log(transactions);
     return (
       <Box className={classes.outer}>

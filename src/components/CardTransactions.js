@@ -64,7 +64,7 @@ const useStyle=makeStyles((theme)=>({
 }))
 const CardTransactions = ({setTransact,cardId}) => {
     useEffect(()=>{
-        console.log('Calling Fetch',cardId)
+        // console.log('Calling Fetch',cardId)
         setPage(1);
         setTransactions([]);
         fetchTransactions();
@@ -143,6 +143,12 @@ const CardTransactions = ({setTransact,cardId}) => {
         return num?.substr(num?.length-4,num?.length);
     }
     const navigate=useNavigate();
+    const [card,setCard]=useState(null);
+    const {cards}=useSelector(state=>state.cardsList);
+    useEffect(()=>{
+        const c=cards.filter((cr)=>cr._id===cardId)[0];
+        setCard(c);
+    },[])
   return (
     <Box className={classes.outer}>
         <Box className={classes.back} onClick={()=>{setTransact(false)}}><ArrowBackIosNewIcon sx={{fontSize:'30px'}}/></Box>
@@ -203,7 +209,6 @@ const CardTransactions = ({setTransact,cardId}) => {
                             <Box className={classes.center} sx={{width:'40%',display:'flex',gap:'10px'}}>
                                 <Box sx={{width:'35%',height:'50px',display:'flex',justifyContent:'center',alignItems:'center'}}>
                                     <Box sx={{
-                                        background:NetworkGradient[transaction?.card?.network],
                                         width:'90%',
                                         height:'80%',
                                         borderRadius:'10px',
@@ -211,10 +216,10 @@ const CardTransactions = ({setTransact,cardId}) => {
                                         justifyContent:'center',
                                         alignItems:'center'
                                     }}>
-                                        <img src={`${transaction?.type==='card'?NetworkImage[transaction?.card?.network]:NetworkImage['IPBS']}`} style={{
-                                            width:transaction?.type!=='card'?'50px':'70%',
-                                            height:transaction?.type!=='card'?'50px':'70%',
-                                            objectFit:'contain'
+                                        <img src={"https://cdn.vox-cdn.com/thumbor/sW5h16et1R3au8ZLVjkcAbcXNi8=/0x0:3151x2048/2000x1333/filters:focal(1575x1024:1576x1025)/cdn.vox-cdn.com/uploads/chorus_asset/file/15844974/netflixlogo.0.0.1466448626.png"} style={{
+                                            width:'100%',
+                                            height:'100%',
+                                            objectFit:'cover'
                                         }} />
                                     </Box>
                                 </Box>
@@ -226,12 +231,15 @@ const CardTransactions = ({setTransact,cardId}) => {
                                         transaction?.type==='Deposit'?
                                         `XX ${mini(transaction?.to?.accountNo)}`
                                         :
+                                        transaction?.type==='card'?
+                                        `${mini(card?.cardNumber)}`
+                                        :
                                         ''
                                         }</Box>
                                     <Box sx={{fontSize:'13px'}}>{transaction?.type==='card'?transaction?.card?.purpose:'IPBS Bank'}</Box>
                                 </Box>
                             </Box>
-                            <Box className={classes.center} sx={{width:'40%'}}>{(transaction?.from?._id===userInfo?._id)?(transaction?.to?.firstName+' '+transaction?.to?.lastName):transaction?.from!==null?(transaction?.from?.firstName+' '+transaction?.from?.lastName):'Money Deposited'}</Box>
+                            <Box className={classes.center} sx={{width:'40%'}}>Netflix</Box>
                             <Box className={classes.center} sx={{
                                 width:'20%',
                                 color:(transaction?.from?._id===userInfo?._id)?'red':'green',

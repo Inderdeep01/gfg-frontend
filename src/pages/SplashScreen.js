@@ -51,7 +51,7 @@ const SplashScreen = ({setFront}) => {
         }
         setProgress(70);
         const {data}=await axios.get(`${URL}/authToken`,config);
-        console.log(data);
+        // console.log(data);
         if(data.message==='Token Verified'){
           setProgress(100);
           setTimeout(()=>{

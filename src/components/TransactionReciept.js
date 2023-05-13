@@ -101,7 +101,7 @@ const TransactionReciept = () => {
   };
   const {userInfo}=useSelector(state=>state.userLogin);
   const classes = useStyle();
-  console.log(transaction);
+  // console.log(transaction);
   return (
     <div>
       <Modal
@@ -134,11 +134,11 @@ const TransactionReciept = () => {
                 }}>
                   <Box sx={{width:'92%',height:'100%',margin:'20px',marginTop:'20px'}}>
                     <Box sx={{fontSize:'18px',fontWeight:'400'}}>Amount</Box>
-                    <Box sx={{fontSize:'25px',fontWeight:'700',display:'flex',alignItems:'center',gap:'15px'}}>{getSymbolFromCurrency(transaction?.currency)} {transaction?.amount} <img src="/img/greenverified.png" style={{width:'25px'}}/></Box>
+                    <Box sx={{fontSize:'25px',fontWeight:'700',display:'flex',alignItems:'center',gap:'15px'}}>{transaction?.type==='forexPurchase' || transaction?.type==='forexTransfer' && `${getSymbolFromCurrency(transaction?.currency)} ${transaction?.amount} =>`} {getSymbolFromCurrency(transaction?.settlement)} {transaction?.settledAmount} <img src="/img/greenverified.png" style={{width:'25px'}}/></Box>
                     <Box sx={{ paddingBottom:'20px',borderBottom:'1px solid lightgrey'}}>{words}</Box>
                     <Box sx={{fontSize:'18px',fontWeight:'400',marginTop:'20px'}}>To {toMy && 'Your'}</Box>
-                    <Box sx={{fontSize:'25px',fontWeight:'500',display:'flex',alignItems:'center',gap:'15px',position:'relative'}}>{toMy?'Interplanetary Bank':`${transaction?.to?.firstName} ${transaction?.to?.lastName}`} <img src="/img/IPBS.png" style={{width:'70px',position:'absolute',right:'10px'}}/></Box>
-                    <Box sx={{paddingBottom:'20px',borderBottom:'1px solid lightgrey'}}> A/C No. - {trimAccountNumber(transaction?.to?.accountNo)} <span style={{color:'#1979e6',cursor:'pointer'}} onClick={()=>CopyToClipboard(transaction?.to?.accountNo)}>Copy</span></Box>
+                    <Box sx={{fontSize:'25px',fontWeight:'500',display:'flex',alignItems:'center',gap:'15px',position:'relative'}}>{toMy?'Interplanetary Bank':transaction?.type==='card'?'Netflix':`${transaction?.to?.firstName} ${transaction?.to?.lastName}`} <img src={transaction?.type==='card'?'https://cdn.vox-cdn.com/thumbor/sW5h16et1R3au8ZLVjkcAbcXNi8=/0x0:3151x2048/2000x1333/filters:focal(1575x1024:1576x1025)/cdn.vox-cdn.com/uploads/chorus_asset/file/15844974/netflixlogo.0.0.1466448626.png':"/img/IPBS.png"} style={{width:'70px',position:'absolute',right:'10px',borderRadius:transaction?.type==='card' && '20px'}}/></Box>
+                    {!transaction?.type==='card'?<Box sx={{paddingBottom:'20px',borderBottom:'1px solid lightgrey'}}> A/C No. - {trimAccountNumber(transaction?.to?.accountNo)} <span style={{color:'#1979e6',cursor:'pointer'}} onClick={()=>CopyToClipboard(transaction?.to?.accountNo)}>Copy</span></Box>:<Box sx={{borderBottom:'1px solid lightgrey',paddingBottom:'30px'}}></Box>}
                     {transaction?.from!==null &&
                     <Box>
                     <Box sx={{fontSize:'18px',fontWeight:'400',marginTop:'20px'}}>From {fromMy && 'Your'}</Box>

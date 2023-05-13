@@ -97,6 +97,7 @@ const useStyle=makeStyles((theme)=>({
         }
     },
     logout:{
+        marginTop:'20px',
         width:'100%',
         height:'50px',
         display:'flex',
@@ -203,7 +204,7 @@ const Sidebar = ({side,setSide}) => {
             <Box className={classes.menuItem} sx={{background:(loc==='' || loc==='dashboard')?'#f4f4f4':'transparent'}} data="dashboard" onClick={handleClick}><DashboardOutlinedIcon sx={{color:'#70707c',fontSize:'20px',marginLeft:'10px',marginRight:'10px'}}/>DashBoard</Box>
             <Box className={classes.menuItem} sx={{background:loc==='transfer'?'#f4f4f4':'transparent'}} data="transfer" onClick={()=>setOpen(true)}><MonetizationOnOutlinedIcon sx={{color:'#70707c',fontSize:'20px',marginLeft:'10px',marginRight:'10px'}}/>Transfer</Box>
             <Box className={classes.menuItem} sx={{background:loc==='forex'?'#f4f4f4':'transparent'}} data="forex" onClick={()=>{setForexOpen(true);setSide(false)}}><CurrencyExchangeIcon sx={{color:'#70707c',fontSize:'20px',marginLeft:'10px',marginRight:'10px'}}/>Forex</Box>
-            <Box className={classes.menuItem} sx={{background:loc==='settings'?'#f4f4f4':'transparent'}} data="settings" onClick={handleClick}><SettingsOutlinedIcon sx={{color:'#70707c',fontSize:'20px',marginLeft:'10px',marginRight:'10px'}}/> Settings</Box>
+            {/* <Box className={classes.menuItem} sx={{background:loc==='settings'?'#f4f4f4':'transparent'}} data="settings" onClick={handleClick}><SettingsOutlinedIcon sx={{color:'#70707c',fontSize:'20px',marginLeft:'10px',marginRight:'10px'}}/> Settings</Box> */}
         </Box>
         <Box className={classes.logout}>
             <Box className={classes.logoutbtn} onClick={()=>{

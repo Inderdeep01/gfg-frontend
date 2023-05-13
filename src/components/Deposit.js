@@ -10,10 +10,11 @@ import { useDispatch, useSelector } from "react-redux";
 import GppMaybeIcon from '@mui/icons-material/GppMaybe';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { GET_ACCOUNT_BALANCE_SUCCESS } from "../store/Constants/AccountBalanceConstant";
-import { NetworkImage } from "../utils/gradientAndImages";
+import { NetworkImage, currencies } from "../utils/gradientAndImages";
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { SET_ACCOUNT_TRANSACTIONS } from "../store/Constants/TransactionsConstant";
 import { inWords } from "./TransactionReciept";
+import getSymbolFromCurrency from "currency-symbol-map";
 const useStyle = makeStyles((theme) => ({
   modal: {
     display: "flex",
@@ -278,8 +279,12 @@ const Deposit = ({ open, setOpen}) => {
                         transform:'translateY(-10px)'
                       }}
                     >
-                      <MenuItem value={'INR'} sx={{textAlign:'center',fontSize:'30px'}}>₹</MenuItem>
-                      <MenuItem value={'USD'} sx={{textAlign:'center',fontSize:'30px'}}>$</MenuItem>
+                      {currencies?.map((curr)=>{
+                        return (
+                          <MenuItem value={curr} sx={{textAlign:'center',fontSize:'22px'}}>{getSymbolFromCurrency(curr)}</MenuItem>
+                        )
+                      })}
+                      {/* <MenuItem value={'USD'} sx={{textAlign:'center',fontSize:'30px'}}>$</MenuItem> */}
                     </Select>
                   </FormControl>
                   <TextField

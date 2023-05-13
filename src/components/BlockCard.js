@@ -103,7 +103,7 @@ const BlockCard = ({open,setOpen,card,method}) => {
                     'Authorization':`Bearer ${userInfo?.token}`
                 }
             }
-            console.log(card.cardNumber);
+            // console.log(card.cardNumber);
             const {data}=await axios.patch(`${URL}/card`,{
                 action:method,
                 cardNumber:card.cardNumber

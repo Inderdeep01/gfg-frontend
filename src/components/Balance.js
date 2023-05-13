@@ -254,9 +254,11 @@ const Balance = ({setTransact}) => {
             }}>
                 <Box sx={{width:'100%',display:'flex',justifyContent:'center',fontSize:'20px',fontWeight:'600'}}>Account Balance</Box>
                 <Box sx={{width:'80%',display:'flex',gap:'30px',overflowX:'scroll',msOverflowStyle:'none',
+                // height:'100%',
                     // '&::-webkit-scrollbar':{
                     //         display:'none'
                     // },
+                    paddingBottom:'10px'
                 }}>
                 {loading && <Skeleton variant='rectangular' width={170} height={190} className={classes.laoding}></Skeleton>}
                 {balances?.map((curr)=>{
@@ -273,7 +275,7 @@ const Balance = ({setTransact}) => {
                             }}>{getSymbolFromCurrency(curr?.currency)}
                              <span style={{
                                 fontSize:'30px',
-                                fontWeight:'bold'
+                                fontWeight:'bold',
                             }}>{Number(curr?.balance).toFixed(2)}</span></Box>
                         </Box>
                     )

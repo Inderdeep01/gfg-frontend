@@ -38,7 +38,7 @@ const useStyle=makeStyles((theme)=>({
       },
       otp__digit:{
         height: 40,
-        width: 40,
+        width: 20,
         backgroundColor: 'transparent',
         borderRadius: 4,
         border: `1px solid lightgrey`,
