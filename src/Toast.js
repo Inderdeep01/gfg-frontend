@@ -18,10 +18,10 @@ export const ToastHtml=(t,tx,navigate)=>{
             </div>
             <div className="ml-3 flex-1">
               <p className="text-sm font-medium text-gray-900">
-                {tx.from.firstName} {tx.from.lastName?tx.from.lastName:''}
+                {tx?.type==='card'?`${tx.card.purpose} Card`:`${tx.from.firstName} ${tx.from.lastName?tx.from.lastName:''}`}
               </p>
               <p className="mt-1 text-sm text-gray-500">
-                Sent you {getSymbolFromCurrency(tx.currency)} {tx.settledAmount}
+                {tx.type==='card'?`Money Debited ${getSymbolFromCurrency(tx.currency)} ${tx.settledAmount}`:`Sent you ${getSymbolFromCurrency(tx.currency)} ${tx.settledAmount}`}
               </p>
             </div>
           </div>
